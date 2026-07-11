@@ -17,8 +17,9 @@
             required
           />
         </div>
+      </div>
 
-        <div class="form-group">
+      <div class="form-row">
         <div class="form-group">
           <label for="email">Correo electrónico</label>
           <input
