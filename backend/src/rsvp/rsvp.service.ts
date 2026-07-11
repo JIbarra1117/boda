@@ -13,8 +13,10 @@ export class RsvpService {
     musicSuggestion?: string;
     message?: string;
   }) {
-    const guest = await this.prisma.guest.findUnique({
-      where: { token: data.guestToken },
+    const guest = await this.prisma.guest.findFirst({
+      where: {
+        OR: [{ token: data.guestToken }, { code: data.guestToken }],
+      },
       include: { rsvp: true },
     });
 

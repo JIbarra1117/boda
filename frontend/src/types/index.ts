@@ -22,6 +22,18 @@ export interface WeddingSettings {
   loveQuote?: string
 }
 
+export interface Guest {
+  id: number
+  fullName: string
+  email?: string
+  phone?: string
+  maxGuests: number
+  token: string
+  code?: string
+  hasRsvp: boolean
+  createdAt: string
+}
+
 export interface RsvpPayload {
   guestToken: string
   attendCeremony: boolean
@@ -34,4 +46,5 @@ export interface RsvpPayload {
 export interface RsvpRecord extends RsvpPayload {
   id: number
   createdAt: string
+  guest?: Guest
 }

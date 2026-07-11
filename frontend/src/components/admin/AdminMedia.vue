@@ -118,20 +118,21 @@ const upload = async () => {
 
 <style scoped>
 .admin-section {
-  background: white;
+  background: var(--color-white);
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 h2 {
-  color: #2b1c43;
+  font-family: var(--font-display);
+  color: var(--color-sage);
   margin-bottom: 0.5rem;
   font-size: 1.5rem;
 }
 
 .hint {
-  color: #80849E;
+  color: var(--color-sage-light);
   margin-bottom: 1.5rem;
   font-size: 0.9rem;
 }
@@ -149,27 +150,30 @@ h2 {
 }
 
 .file-group label {
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #2b1c43;
+  color: var(--color-sage-light);
+  font-family: var(--font-body);
 }
 
 .file-group input[type='file'] {
-  padding: 0.5rem;
-  border: 1px dashed #C2B8E3;
-  border-radius: 4px;
-  background: #fafafa;
+  padding: 0.75rem;
+  border: 1px dashed var(--color-lavender-soft);
+  border-radius: var(--radius-md);
+  background: var(--bg-secondary);
+  font-family: var(--font-body);
+  color: var(--color-sage);
 }
 
 .preview {
   margin-top: 0.5rem;
   width: 160px;
   height: 160px;
-  border: 2px solid #C2B8E3;
-  border-radius: 4px;
+  border: 2px solid var(--color-lavender-soft);
+  border-radius: var(--radius-md);
   overflow: hidden;
-  background: #EBE7E5;
+  background: var(--color-sand);
 }
 
 .preview img {
@@ -180,23 +184,26 @@ h2 {
 
 .file-name {
   font-size: 0.9rem;
-  color: #80849E;
+  color: var(--color-sage-light);
   font-style: italic;
 }
 
 button {
   align-self: flex-start;
   padding: 0.7rem 1.5rem;
-  background-color: #80849E;
-  color: white;
+  background-color: var(--color-sage);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 1rem;
+  font-family: var(--font-body);
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 button:hover:not(:disabled) {
-  background-color: #2b1c43;
+  background-color: var(--color-sage-dark);
+  transform: translateY(-1px);
 }
 
 button:disabled {
@@ -209,10 +216,16 @@ button:disabled {
 }
 
 .success {
-  color: #2b1c43;
+  color: var(--color-sage);
 }
 
 .error {
-  color: #c0392b;
+  color: var(--color-error);
+}
+
+@media (max-width: 640px) {
+  .admin-section {
+    padding: 1.25rem;
+  }
 }
 </style>

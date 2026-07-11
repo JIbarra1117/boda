@@ -12,6 +12,7 @@
       :is-opening="isOpening"
       :is-breaking="isBreaking"
       :is-opened="isOpened"
+      :guest="guest"
       @open="startOpening"
     />
 
@@ -20,13 +21,13 @@
       class="invitation-content"
       :class="{ 'is-revealing': isOpening, 'is-revealed': isOpened }"
     >
-      <HeroSection :settings="settings" />
+      <HeroSection :settings="settings" :guest="guest" />
       <CoupleSection :settings="settings" />
       <StorySection />
       <DetailsSection :settings="settings" />
       <CountdownSection :settings="settings" />
       <VerseSection />
-      <RsvpSection />
+      <RsvpSection :guest="guest" @guest-identified="guest = $event" />
       <GiftsSection :settings="settings" />
     </main>
 
@@ -43,7 +44,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch, provide } from 'vue'
+import { useRoute } from 'vue-router'
 import { api } from '@/api/api'
 import AppHeader from '@/components/AppHeader.vue'
 import AppFooter from '@/components/AppFooter.vue'
@@ -57,9 +59,16 @@ import RsvpSection from '@/components/sections/RsvpSection.vue'
 import GiftsSection from '@/components/sections/GiftsSection.vue'
 import StorySection from '@/components/sections/StorySection.vue'
 import VerseSection from '@/components/sections/VerseSection.vue'
-import type { WeddingSettings } from '@/types'
+import type { WeddingSettings, Guest } from '@/types'
+
+const route = useRoute()
 
 const settings = ref<WeddingSettings | null>(null)
+const guest = ref<Guest | null>(null)
+
+provide('setGuest', (value: Guest | null) => {
+  guest.value = value
+})
 const loading = ref(true)
 const isBreaking = ref(false)
 const isOpening = ref(false)
@@ -99,8 +108,15 @@ const startOpening = () => {
 }
 
 onMounted(async () => {
+  const token = route.query.guest?.toString()
+
   try {
-    settings.value = await api.getSettings()
+    const [settingsData, guestData] = await Promise.all([
+      api.getSettings(),
+      token ? api.getGuestByToken(token).catch(() => null) : Promise.resolve(null),
+    ])
+    settings.value = settingsData
+    guest.value = guestData
   } catch (e) {
     console.error('Error loading settings', e)
   } finally {

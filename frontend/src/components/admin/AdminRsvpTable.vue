@@ -1,6 +1,10 @@
 <template>
   <div class="admin-section">
-    <h2>Confirmaciones RSVP</h2>
+    <div class="section-intro">
+      <h2>Confirmaciones RSVP</h2>
+      <p class="hint">Lista de invitados que ya confirmaron su asistencia a la ceremonia y celebración.</p>
+    </div>
+
     <div class="table-wrapper">
       <table>
         <thead>
@@ -16,7 +20,9 @@
         </thead>
         <tbody>
           <tr v-for="r in rsvps" :key="r.id">
-            <td>{{ r.guest?.fullName || '—' }}</td>
+            <td>
+              <div class="guest-name">{{ r.guest?.fullName || '—' }}</div>
+            </td>
             <td>
               <span class="badge" :class="r.attendCeremony ? 'yes' : 'no'">
                 {{ r.attendCeremony ? 'Sí' : 'No' }}
@@ -29,7 +35,11 @@
             </td>
             <td>{{ r.numberOfGuests }}</td>
             <td>{{ r.musicSuggestion || '—' }}</td>
-            <td>{{ r.message || '—' }}</td>
+            <td>
+              <span class="message-cell" :title="r.message || ''">
+                {{ r.message || '—' }}
+              </span>
+            </td>
             <td>{{ formatDate(r.createdAt) }}</td>
           </tr>
           <tr v-if="rsvps.length === 0">
@@ -42,10 +52,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
-import { api } from '@/api/api'
+import type { RsvpRecord } from '@/types'
 
-const rsvps = ref<any[]>([])
+defineProps<{
+  rsvps: RsvpRecord[]
+}>()
 
 const formatDate = (iso: string) => {
   const d = new Date(iso)
@@ -57,82 +68,118 @@ const formatDate = (iso: string) => {
     minute: '2-digit',
   })
 }
-
-onMounted(async () => {
-  try {
-    rsvps.value = await api.getRsvps()
-  } catch (e) {
-    console.error(e)
-  }
-})
 </script>
 
 <style scoped>
 .admin-section {
-  background: white;
+  background: var(--color-white);
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
-h2 {
-  color: #2b1c43;
+.section-intro {
   margin-bottom: 1.5rem;
+}
+
+.section-intro h2 {
+  font-family: var(--font-display);
+  color: var(--color-sage);
+  margin-bottom: 0.5rem;
   font-size: 1.5rem;
+}
+
+.hint {
+  color: var(--color-sage-light);
+  font-size: 0.9rem;
+  margin: 0;
 }
 
 .table-wrapper {
   overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-sand);
 }
 
 table {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9rem;
+  background: var(--color-white);
 }
 
 th,
 td {
-  padding: 0.75rem;
+  padding: 0.875rem 1rem;
   text-align: left;
-  border-bottom: 1px solid #EBE7E5;
+  border-bottom: 1px solid var(--color-sand);
 }
 
 th {
-  background-color: #f7f6f5;
-  color: #2b1c43;
+  background-color: #f5f3f8;
+  color: var(--color-sage);
+  font-family: var(--font-body);
   font-weight: 700;
   text-transform: uppercase;
-  font-size: 0.75rem;
-  letter-spacing: 0.05em;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
 }
 
-td {
-  color: #2b1c43;
+tr:nth-child(even) {
+  background-color: var(--bg-secondary);
+}
+
+tr:hover {
+  background-color: #f9f7fc;
+}
+
+.guest-name {
+  font-weight: 600;
+  color: var(--color-sage);
+}
+
+.message-cell {
+  display: block;
+  max-width: 200px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--color-sage-light);
 }
 
 .badge {
   display: inline-block;
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  font-size: 0.8rem;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
   font-weight: 700;
 }
 
 .badge.yes {
-  background-color: #2b1c43;
-  color: white;
+  background-color: var(--color-sage);
+  color: var(--color-white);
 }
 
 .badge.no {
-  background-color: #EBE7E5;
-  color: #80849E;
+  background-color: var(--color-sand);
+  color: var(--color-sage-light);
 }
 
 .empty {
   text-align: center;
-  color: #80849E;
+  color: var(--color-sage-light);
   padding: 2rem;
   font-style: italic;
+}
+
+@media (max-width: 640px) {
+  .admin-section {
+    padding: 1.25rem;
+  }
+
+  th,
+  td {
+    padding: 0.75rem;
+  }
 }
 </style>
