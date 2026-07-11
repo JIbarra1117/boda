@@ -307,6 +307,21 @@ const openQr = (guest: Guest) => {
   selectedGuest.value = guest
 }
 
+const decodeBytes = (bytes: Uint8Array): string => {
+  // Intentar UTF-8 primero
+  const utf8 = new TextDecoder('utf-8', { fatal: true }).decode(bytes)
+  // Si el resultado tiene secuencias tÃ­picas de mojibake, probar Latin-1
+  if (utf8.includes('Ã') || utf8.includes('Â')) {
+    try {
+      const latin1 = new TextDecoder('iso-8859-1', { fatal: true }).decode(bytes)
+      return latin1
+    } catch {
+      return utf8
+    }
+  }
+  return utf8
+}
+
 const handleExcelUpload = (event: Event) => {
   const target = event.target as HTMLInputElement
   const file = target.files?.[0]
@@ -315,11 +330,22 @@ const handleExcelUpload = (event: Event) => {
   bulkSuccess.value = ''
   bulkErrors.value = []
 
+  const isCsv = file.name.toLowerCase().endsWith('.csv')
+
   const reader = new FileReader()
   reader.onload = (e) => {
     try {
-      const data = new Uint8Array(e.target?.result as ArrayBuffer)
-      const workbook = XLSX.read(data, { type: 'array' })
+      let workbook: XLSX.WorkBook
+
+      if (isCsv) {
+        const bytes = new Uint8Array(e.target?.result as ArrayBuffer)
+        const text = decodeBytes(bytes)
+        workbook = XLSX.read(text, { type: 'string' })
+      } else {
+        const data = new Uint8Array(e.target?.result as ArrayBuffer)
+        workbook = XLSX.read(data, { type: 'array' })
+      }
+
       const sheetName = workbook.SheetNames[0]
       const worksheet = workbook.Sheets[sheetName]
       const json = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][]
