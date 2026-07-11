@@ -1,11 +1,11 @@
 import QRCode from 'qrcode'
 import type { Guest } from '@/types'
 
-const QR_SIZE = 500
-const CANVAS_SIZE = 580
-const LOGO_SIZE = 90
-const LOGO_RADIUS = 12
-const QR_RADIUS = 28
+const QR_SIZE = 600
+const CANVAS_SIZE = 680
+const LOGO_SIZE = 70
+const LOGO_RADIUS = 10
+const QR_RADIUS = 32
 const QR_COLOR = '#B8860B' // Dorado oscuro
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
