@@ -6,7 +6,6 @@ const CANVAS_SIZE = 480
 const LOGO_SIZE = 130
 const LOGO_RADIUS = 16
 const QR_RADIUS = 24
-const QR_COLOR = '#C9A227' // Dorado
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -55,13 +54,13 @@ export const drawGuestQr = async (
   drawRoundedRect(ctx, padding, padding, QR_SIZE, QR_SIZE, QR_RADIUS)
   ctx.fill()
 
-  // Generar QR
+  // Generar QR en negro para usar como máscara
   const inviteUrl = `${baseUrl}?guest=${guest.token}`
   const qrDataUrl = await QRCode.toDataURL(inviteUrl, {
     width: QR_SIZE,
     margin: 0,
     color: {
-      dark: QR_COLOR,
+      dark: '#000000',
       light: '#FFFFFF00', // transparente
     },
   })
@@ -75,6 +74,16 @@ export const drawGuestQr = async (
   drawRoundedRect(ctx, padding, padding, QR_SIZE, QR_SIZE, QR_RADIUS)
   ctx.clip()
   ctx.drawImage(qrImage, padding, padding, QR_SIZE, QR_SIZE)
+
+  // Aplicar gradiente dorado sobre el QR (solo los píxeles negros)
+  ctx.globalCompositeOperation = 'source-in'
+  const gradient = ctx.createLinearGradient(padding, padding, padding + QR_SIZE, padding + QR_SIZE)
+  gradient.addColorStop(0, '#B8860B') // Dorado oscuro
+  gradient.addColorStop(0.5, '#D4AF37') // Dorado medio
+  gradient.addColorStop(1, '#F0C674') // Dorado claro
+  ctx.fillStyle = gradient
+  ctx.fillRect(padding, padding, QR_SIZE, QR_SIZE)
+
   ctx.restore()
 
   // Logo en el centro
