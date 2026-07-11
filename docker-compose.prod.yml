@@ -1,0 +1,68 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: boda_db_prod
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-boda_user}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-boda_password}
+      POSTGRES_DB: ${POSTGRES_DB:-boda_db}
+    volumes:
+      - postgres_data_prod:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-boda_user} -d ${POSTGRES_DB:-boda_db}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: boda_backend_prod
+    restart: always
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-boda_user}:${POSTGRES_PASSWORD:-boda_password}@db:5432/${POSTGRES_DB:-boda_db}?schema=public
+      NODE_ENV: production
+      PORT: 3000
+      ADMIN_PASSWORD: ${ADMIN_PASSWORD:-boda2026}
+    volumes:
+      - uploads_prod:/app/uploads
+    depends_on:
+      db:
+        condition: service_healthy
+    command: >
+      sh -c "npx prisma migrate deploy || npx prisma db push --accept-data-loss && npx prisma generate && npm run build && npm run start:prod"
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    container_name: boda_frontend_prod
+    restart: always
+    environment:
+      VITE_API_URL: ${VITE_API_URL:-https://karenyjorge.jorgeibarra.dev/api}
+      VITE_APP_URL: ${VITE_APP_URL:-https://karenyjorge.jorgeibarra.dev}
+    depends_on:
+      - backend
+
+  nginx:
+    image: nginx:alpine
+    container_name: boda_nginx_prod
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - certbot_data:/etc/letsencrypt
+      - certbot_www:/var/www/certbot
+    depends_on:
+      - frontend
+      - backend
+
+volumes:
+  postgres_data_prod:
+  uploads_prod:
+  certbot_data:
+  certbot_www:
