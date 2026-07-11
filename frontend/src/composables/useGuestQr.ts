@@ -6,6 +6,7 @@ const CANVAS_SIZE = 480
 const LOGO_SIZE = 130
 const LOGO_RADIUS = 16
 const QR_RADIUS = 24
+const QR_COLOR = '#B8860B' // Dorado oscuro
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -38,29 +39,6 @@ const drawRoundedRect = (
   ctx.closePath()
 }
 
-const drawQrOnCanvas = async (
-  ctx: CanvasRenderingContext2D,
-  inviteUrl: string,
-  color: string,
-  x: number,
-  y: number,
-  size: number
-) => {
-  const qrDataUrl = await QRCode.toDataURL(inviteUrl, {
-    width: size,
-    margin: 0,
-    color: {
-      dark: color,
-      light: '#FFFFFF00',
-    },
-  })
-
-  const qrImage = new Image()
-  qrImage.src = qrDataUrl
-  await new Promise<void>((resolve) => (qrImage.onload = () => resolve()))
-  ctx.drawImage(qrImage, x, y, size, size)
-}
-
 export const drawGuestQr = async (
   ctx: CanvasRenderingContext2D,
   guest: Guest,
@@ -68,43 +46,44 @@ export const drawGuestQr = async (
   size: number = CANVAS_SIZE
 ) => {
   const padding = (size - QR_SIZE) / 2
-  const qrX = padding
-  const qrY = padding
 
   // Fondo transparente
   ctx.clearRect(0, 0, size, size)
 
   // Fondo blanco del QR con esquinas redondeadas
   ctx.fillStyle = '#FFFFFF'
-  drawRoundedRect(ctx, qrX, qrY, QR_SIZE, QR_SIZE, QR_RADIUS)
+  drawRoundedRect(ctx, padding, padding, QR_SIZE, QR_SIZE, QR_RADIUS)
   ctx.fill()
 
-  // Gradient dorado de fondo
-  ctx.save()
-  drawRoundedRect(ctx, qrX, qrY, QR_SIZE, QR_SIZE, QR_RADIUS)
-  ctx.clip()
-  const gradient = ctx.createLinearGradient(qrX, qrY, qrX + QR_SIZE, qrY + QR_SIZE)
-  gradient.addColorStop(0, '#B8860B')
-  gradient.addColorStop(0.5, '#D4AF37')
-  gradient.addColorStop(1, '#F0C674')
-  ctx.fillStyle = gradient
-  ctx.fillRect(qrX, qrY, QR_SIZE, QR_SIZE)
-  ctx.restore()
-
-  // QR en blanco encima del gradiente
+  // Generar QR en dorado oscuro
   const inviteUrl = `${baseUrl}?guest=${guest.token}`
+  const qrDataUrl = await QRCode.toDataURL(inviteUrl, {
+    width: QR_SIZE,
+    margin: 0,
+    color: {
+      dark: QR_COLOR,
+      light: '#FFFFFF00',
+    },
+  })
+
+  const qrImage = new Image()
+  qrImage.src = qrDataUrl
+  await new Promise<void>((resolve) => (qrImage.onload = () => resolve()))
+
+  // Recortar el QR dentro del rectángulo redondeado
   ctx.save()
-  drawRoundedRect(ctx, qrX, qrY, QR_SIZE, QR_SIZE, QR_RADIUS)
+  drawRoundedRect(ctx, padding, padding, QR_SIZE, QR_SIZE, QR_RADIUS)
   ctx.clip()
-  await drawQrOnCanvas(ctx, inviteUrl, '#FFFFFF', qrX, qrY, QR_SIZE)
+  ctx.drawImage(qrImage, padding, padding, QR_SIZE, QR_SIZE)
   ctx.restore()
 
   // Logo en el centro
   try {
     const logo = await loadImage('/imgs/kj-transparent.png')
-    const logoX = qrX + QR_SIZE / 2 - LOGO_SIZE / 2
-    const logoY = qrY + QR_SIZE / 2 - LOGO_SIZE / 2
+    const logoX = padding + QR_SIZE / 2 - LOGO_SIZE / 2
+    const logoY = padding + QR_SIZE / 2 - LOGO_SIZE / 2
 
+    // Fondo blanco cuadrado con esquinas redondeadas detrás del logo
     ctx.fillStyle = '#FFFFFF'
     drawRoundedRect(ctx, logoX - 4, logoY - 4, LOGO_SIZE + 8, LOGO_SIZE + 8, LOGO_RADIUS)
     ctx.fill()
