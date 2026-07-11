@@ -9,7 +9,7 @@ sudo apt update
 sudo apt install -y certbot
 
 echo "Obteniendo certificado SSL para $DOMAIN..."
-sudo certbot certonly --standalone -d "$DOMAIN" --agree-tos --no-eff-email -m "$EMAIL"
+sudo certbot certonly --webroot -w /var/www/certbot -d "$DOMAIN" --agree-tos --no-eff-email -m "$EMAIL"
 
 echo "Copiando configuración SSL de Nginx..."
 cp nginx/nginx.ssl.conf nginx/nginx.conf
