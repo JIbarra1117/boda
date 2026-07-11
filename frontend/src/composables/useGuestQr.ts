@@ -6,6 +6,7 @@ const CANVAS_SIZE = 480
 const LOGO_SIZE = 130
 const LOGO_RADIUS = 16
 const QR_RADIUS = 24
+const QR_COLOR = '#C9A227' // Dorado
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
@@ -60,7 +61,7 @@ export const drawGuestQr = async (
     width: QR_SIZE,
     margin: 0,
     color: {
-      dark: '#2b1c43',
+      dark: QR_COLOR,
       light: '#FFFFFF00', // transparente
     },
   })
