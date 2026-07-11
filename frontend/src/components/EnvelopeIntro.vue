@@ -38,6 +38,36 @@
       />
     </button>
 
+    <!-- Etiqueta de invitado amarrada al sobre -->
+    <Transition name="tag">
+      <div
+        v-if="!isLoading && guest && !isOpened"
+        class="guest-tag-wrapper"
+        :class="{ 'is-flying': isOpening }"
+        key="guest"
+      >
+        <div class="tag-ribbon" aria-hidden="true">
+          <div class="tag-bow">
+            <span class="bow-loop left"></span>
+            <span class="bow-loop right"></span>
+            <span class="bow-knot"></span>
+            <span class="ribbon-tail left"></span>
+            <span class="ribbon-tail right"></span>
+          </div>
+          <div class="ribbon-strand"></div>
+        </div>
+
+        <div class="guest-tag">
+          <div class="tag-hole" aria-hidden="true"></div>
+          <div class="tag-content">
+            <span class="tag-pretitle">Invitación para</span>
+            <span class="tag-name">{{ guest.fullName }}</span>
+          </div>
+          <div class="tag-shadow" aria-hidden="true"></div>
+        </div>
+      </div>
+    </Transition>
+
     <!-- Texto de carga / hint -->
     <Transition name="fade" mode="out-in">
       <p v-if="isLoading" class="stage-text loading-text" key="loading">
@@ -51,11 +81,14 @@
 </template>
 
 <script setup lang="ts">
+import type { Guest } from '@/types'
+
 const props = defineProps<{
   isLoading: boolean
   isOpening: boolean
   isBreaking: boolean
   isOpened: boolean
+  guest?: Guest | null
 }>()
 
 const emit = defineEmits<{
@@ -291,6 +324,203 @@ const handleClick = () => {
   pointer-events: none;
 }
 
+/* Etiqueta de invitado amarrada al sobre */
+.guest-tag-wrapper {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 25;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  animation: tagSwing 3s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.guest-tag-wrapper.is-flying {
+  animation: tagFlyAway 1s ease-in forwards;
+}
+
+.tag-ribbon {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: -6px;
+}
+
+.tag-bow {
+  position: relative;
+  width: 80px;
+  height: 34px;
+  z-index: 2;
+}
+
+.bow-loop {
+  position: absolute;
+  top: 0;
+  width: 40px;
+  height: 34px;
+  background: linear-gradient(135deg, #C9B99A 0%, #B8A88A 50%, #D4C4A5 100%);
+  border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.bow-loop.left {
+  left: 0;
+  transform: rotate(-15deg);
+}
+
+.bow-loop.right {
+  right: 0;
+  transform: rotate(15deg) scaleX(-1);
+}
+
+.bow-knot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: linear-gradient(135deg, #C9B99A 0%, #B8A88A 100%);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
+  z-index: 3;
+}
+
+.ribbon-tail {
+  position: absolute;
+  top: 24px;
+  width: 12px;
+  height: 28px;
+  background: linear-gradient(180deg, #C9B99A 0%, #B8A88A 100%);
+  border-radius: 0 0 6px 6px;
+  z-index: 1;
+}
+
+.ribbon-tail.left {
+  left: 28px;
+  transform: rotate(-25deg);
+}
+
+.ribbon-tail.right {
+  right: 28px;
+  transform: rotate(25deg);
+}
+
+.ribbon-strand {
+  width: 8px;
+  height: 28px;
+  background: linear-gradient(90deg, #B8A88A, #C9B99A, #B8A88A);
+  margin-top: -4px;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.guest-tag {
+  position: relative;
+  background: linear-gradient(135deg, #FAF8F5 0%, #F3EFE9 100%);
+  border: 1px solid rgba(194, 184, 227, 0.4);
+  border-radius: 12px 12px 18px 18px;
+  padding: 1rem 1.75rem 1.1rem;
+  box-shadow:
+    0 8px 24px rgba(0, 0, 0, 0.18),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transform: rotate(-2deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 180px;
+  max-width: 280px;
+}
+
+.tag-hole {
+  position: absolute;
+  top: -7px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 14px;
+  height: 14px;
+  background: radial-gradient(circle at 30% 30%, #5a4a3a 0%, #2b1c43 100%);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+}
+
+.tag-hole::after {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  background: var(--color-sage-dark);
+  border-radius: 50%;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.tag-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+  text-align: center;
+}
+
+.tag-pretitle {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--color-sage-light);
+}
+
+.tag-name {
+  font-family: var(--font-script);
+  font-size: 1.6rem;
+  color: var(--color-sage);
+  line-height: 1.2;
+  text-align: center;
+  white-space: normal;
+  word-break: break-word;
+  max-width: 240px;
+}
+
+.tag-shadow {
+  position: absolute;
+  bottom: -8px;
+  left: 10%;
+  right: 10%;
+  height: 12px;
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 50%;
+  filter: blur(6px);
+  z-index: -1;
+}
+
+@keyframes tagSwing {
+  0%, 100% {
+    transform: translateX(-50%) rotate(-1deg);
+  }
+  50% {
+    transform: translateX(-50%) rotate(1deg);
+  }
+}
+
+@keyframes tagFlyAway {
+  0% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) rotate(-2deg);
+  }
+  40% {
+    opacity: 1;
+    transform: translateX(-50%) translateY(-20px) rotate(2deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-120px) rotate(-8deg);
+  }
+}
+
 /* Texto inferior */
 .stage-text {
   position: absolute;
@@ -337,6 +567,25 @@ const handleClick = () => {
   }
 }
 
+/* Transición de Vue para la etiqueta */
+.tag-enter-active {
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.tag-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-30px) rotate(-6deg);
+}
+
+.tag-leave-active {
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.tag-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-100px) rotate(-10deg);
+}
+
 /* Responsive */
 @media (max-width: 640px) {
   .wax-seal {
@@ -348,12 +597,35 @@ const handleClick = () => {
     font-size: 0.7rem;
     letter-spacing: 0.15em;
   }
+
+  .guest-tag {
+    padding: 0.85rem 1.25rem 0.95rem;
+    min-width: 150px;
+    max-width: 220px;
+  }
+
+  .tag-name {
+    font-size: 1.3rem;
+    max-width: 180px;
+  }
+
+  .tag-pretitle {
+    font-size: 0.55rem;
+  }
+
+  .tag-bow {
+    transform: scale(0.85);
+  }
 }
 
 @media (max-width: 360px) {
   .wax-seal {
     width: 170px;
     height: 170px;
+  }
+
+  .tag-name {
+    font-size: 1.1rem;
   }
 }
 </style>

@@ -9,16 +9,24 @@
     </div>
 
     <div class="story-timeline">
-      <div class="timeline-line" aria-hidden="true"></div>
+      <div class="timeline-line" aria-hidden="true">
+        <div class="timeline-progress" :style="{ height: progressHeight }"></div>
+      </div>
 
       <div
         v-for="(group, index) in storyGroups"
         :key="`group-${index}`"
         ref="groupRefs"
         class="story-group"
-        :class="{ 'is-visible': visibleGroups.has(index) }"
+        :class="{ 'is-visible': visibleGroups.has(index), 'is-active': activeGroup === index }"
+        @mouseenter="activeGroup = index"
+        @mouseleave="activeGroup = null"
+        @click="toggleGroup(index)"
       >
-        <div class="group-year">{{ group.year }}</div>
+        <div class="group-year">
+          <span class="year-dot"></span>
+          <span class="year-text">{{ group.year }}</span>
+        </div>
 
         <svg
           class="group-curve"
@@ -38,7 +46,7 @@
 
         <div class="group-events">
           <div class="story-event event-left">
-            <div class="event-photo">
+            <div class="event-photo" :style="{ width: groupSizes[index], height: groupSizes[index] }">
               <img
                 :src="getImageUrl(group.left.imageName)"
                 :alt="group.left.title"
@@ -54,7 +62,7 @@
           </div>
 
           <div class="story-event event-right">
-            <div class="event-photo">
+            <div class="event-photo" :style="{ width: groupSizes[index], height: groupSizes[index] }">
               <img
                 :src="getImageUrl(group.right.imageName)"
                 :alt="group.right.title"
@@ -76,14 +84,17 @@
         :key="`center-${index}`"
         ref="centerRefs"
         class="story-event center-event"
-        :class="{ 'is-visible': visibleCenters.has(index) }"
+        :class="{ 'is-visible': visibleCenters.has(index), 'is-active': activeCenter === index }"
+        @mouseenter="activeCenter = index"
+        @mouseleave="activeCenter = null"
+        @click="toggleCenter(index)"
       >
         <div class="event-marker" aria-hidden="true">
           <span class="marker-dot"></span>
           <span class="marker-year">{{ event.year }}</span>
         </div>
 
-        <div class="event-photo">
+        <div class="event-photo" :style="{ width: centerSizes[index], height: centerSizes[index] }">
           <img
             :src="getImageUrl(event.imageName)"
             :alt="event.title"
@@ -180,10 +191,10 @@ const centerEvents: CenterEvent[] = [
     imageName: '2018-conocidos',
   },
   {
-    year: '2019',
+    year: '2022',
     stage: 'Novios',
-    title: 'Empezamos nuestra historia',
-    description: 'Decidimos caminar juntos, construyendo recuerdos inolvidables.',
+    title: 'Juntos en esta aventura',
+    description: 'Caminamos de la mano, construyendo recuerdos inolvidables.',
     imageName: 'novios',
   },
   {
@@ -194,6 +205,9 @@ const centerEvents: CenterEvent[] = [
     imageName: 'propuesta',
   },
 ]
+
+const groupSizes = ['220px', '260px', '300px']
+const centerSizes = ['280px', '320px', '360px', '400px']
 
 const getImageUrl = (name: string) => `/imgs/historia/${name}.jpg`
 
@@ -214,7 +228,40 @@ const visibleGroups = ref(new Set<number>())
 const centerRefs = ref<HTMLElement[]>([])
 const visibleCenters = ref(new Set<number>())
 
+const activeGroup = ref<number | null>(null)
+const activeCenter = ref<number | null>(null)
+const progressHeight = ref('0%')
+
+const toggleGroup = (index: number) => {
+  activeGroup.value = activeGroup.value === index ? null : index
+}
+
+const toggleCenter = (index: number) => {
+  activeCenter.value = activeCenter.value === index ? null : index
+}
+
 let observer: IntersectionObserver | null = null
+let focusObserver: IntersectionObserver | null = null
+
+const updateProgress = () => {
+  const timeline = document.querySelector('.story-timeline')
+  const section = document.querySelector('.story-section')
+  if (!timeline || !section) return
+
+  const sectionRect = section.getBoundingClientRect()
+  const timelineRect = timeline.getBoundingClientRect()
+  const viewportHeight = window.innerHeight
+
+  // El progreso comienza cuando la parte superior de la sección entra a la mitad inferior de la pantalla
+  // y termina cuando la parte inferior de la sección sale por la parte inferior
+  const start = sectionRect.top - viewportHeight * 0.6
+  const end = timelineRect.bottom - viewportHeight * 0.4
+  const total = end - start
+  const current = -start
+
+  const progress = Math.max(0, Math.min(1, current / total))
+  progressHeight.value = `${progress * 100}%`
+}
 
 onMounted(() => {
   if (typeof IntersectionObserver === 'undefined') {
@@ -251,10 +298,30 @@ onMounted(() => {
     el.setAttribute('data-type', 'center')
     observer?.observe(el)
   })
+
+  focusObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        entry.target.classList.toggle('is-focused', entry.isIntersecting)
+      })
+    },
+    { rootMargin: '-45% 0px -45% 0px', threshold: 0 }
+  )
+
+  document.querySelectorAll('.story-group, .story-event, .center-event').forEach((el) => {
+    focusObserver?.observe(el)
+  })
+
+  updateProgress()
+  window.addEventListener('scroll', updateProgress, { passive: true })
+  window.addEventListener('resize', updateProgress, { passive: true })
 })
 
 onUnmounted(() => {
   observer?.disconnect()
+  focusObserver?.disconnect()
+  window.removeEventListener('scroll', updateProgress)
+  window.removeEventListener('resize', updateProgress)
 })
 </script>
 
@@ -314,7 +381,7 @@ onUnmounted(() => {
   padding: var(--space-8) 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-16);
+  gap: var(--space-20);
 }
 
 /* Central straight line for shared events */
@@ -333,6 +400,20 @@ onUnmounted(() => {
   );
   transform: translateX(-50%);
   z-index: 1;
+  overflow: hidden;
+}
+
+.timeline-progress {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--color-lavender-light) 0%,
+    var(--color-sage) 100%
+  );
+  transition: height 0.3s ease-out;
 }
 
 /* Story group (one year, two photos) */
@@ -342,6 +423,7 @@ onUnmounted(() => {
   transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s ease;
   z-index: 2;
+  cursor: pointer;
 }
 
 .story-group.is-visible {
@@ -354,13 +436,33 @@ onUnmounted(() => {
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
   font-family: var(--font-display);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-style: italic;
   color: var(--text-primary);
   z-index: 4;
   background: var(--bg-secondary);
-  padding: var(--space-1) var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-lavender-soft);
+  box-shadow: 0 0 0 4px rgba(194, 184, 227, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.year-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--color-lavender-soft);
+}
+
+.story-group.is-active .group-year,
+.story-group:hover .group-year {
+  transform: translate(-50%, -50%) scale(1.1);
+  box-shadow: 0 0 0 8px rgba(194, 184, 227, 0.25);
 }
 
 .group-curve {
@@ -369,6 +471,13 @@ onUnmounted(() => {
   width: 100%;
   height: 100%;
   z-index: 1;
+  opacity: 0.6;
+  transition: opacity 0.3s ease;
+}
+
+.story-group:hover .group-curve,
+.story-group.is-active .group-curve {
+  opacity: 1;
 }
 
 .group-curve path {
@@ -390,6 +499,12 @@ onUnmounted(() => {
   align-items: center;
   gap: var(--space-4);
   width: 45%;
+  transition: transform 0.4s ease;
+}
+
+.story-group:hover .story-event,
+.story-group.is-active .story-event {
+  transform: translateY(-4px);
 }
 
 .event-left {
@@ -404,8 +519,6 @@ onUnmounted(() => {
 
 /* Event photo */
 .event-photo {
-  width: 320px;
-  height: 320px;
   border-radius: 50%;
   overflow: hidden;
   border: 5px solid var(--color-white);
@@ -414,6 +527,20 @@ onUnmounted(() => {
   flex-shrink: 0;
   position: relative;
   z-index: 3;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.story-event:hover .event-photo,
+.story-event.is-active .event-photo {
+  transform: scale(1.05);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
+}
+
+/* Zoom al enfocar con scroll (desktop: grupo completo) */
+.story-group.is-focused .event-photo,
+.center-event.is-focused .event-photo {
+  transform: scale(1.08);
+  box-shadow: var(--shadow-lg), var(--shadow-glow);
 }
 
 .event-photo img {
@@ -421,6 +548,12 @@ onUnmounted(() => {
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.6s ease;
+}
+
+.story-event:hover .event-photo img,
+.story-event.is-active .event-photo img {
+  transform: scale(1.08);
 }
 
 /* Event content */
@@ -431,11 +564,30 @@ onUnmounted(() => {
   max-width: 340px;
   position: relative;
   z-index: 3;
+  padding: var(--space-4);
+  border-radius: var(--radius-lg);
+  background: rgba(250, 248, 245, 0.7);
+  backdrop-filter: blur(4px);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.story-event:hover .event-content,
+.story-event.is-active .event-content {
+  background: var(--color-white);
+  transform: translateY(-2px);
+}
+
+.event-left .event-content {
+  align-items: flex-end;
+}
+
+.event-right .event-content {
+  align-items: flex-start;
 }
 
 .event-stage {
   font-family: var(--font-body);
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   text-transform: uppercase;
   letter-spacing: 0.2em;
   color: var(--text-muted);
@@ -443,14 +595,14 @@ onUnmounted(() => {
 
 .event-title {
   font-family: var(--font-display);
-  font-size: var(--text-3xl);
+  font-size: var(--text-2xl);
   color: var(--text-primary);
   margin: 0;
 }
 
 .event-description {
   font-family: var(--font-body);
-  font-size: var(--text-lg);
+  font-size: var(--text-base);
   color: var(--text-secondary);
   line-height: 1.6;
   margin: 0;
@@ -464,17 +616,23 @@ onUnmounted(() => {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 520px;
+  max-width: 560px;
   position: relative;
   z-index: 2;
   opacity: 0;
   transform: translateY(40px);
   transition: opacity 0.8s ease, transform 0.8s ease;
+  cursor: pointer;
 }
 
 .center-event.is-visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+.center-event:hover,
+.center-event.is-active {
+  transform: translateY(-6px);
 }
 
 .event-marker {
@@ -486,28 +644,41 @@ onUnmounted(() => {
   position: relative;
   z-index: 3;
   background: var(--bg-secondary);
-  padding: var(--space-1) var(--space-3);
+  padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
+  border: 2px solid var(--color-lavender-soft);
+  box-shadow: 0 0 0 4px rgba(194, 184, 227, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.center-event:hover .event-marker,
+.center-event.is-active .event-marker {
+  transform: scale(1.1);
+  box-shadow: 0 0 0 8px rgba(194, 184, 227, 0.25);
 }
 
 .center-event .event-content {
-  background: var(--bg-secondary);
-  padding: var(--space-4) var(--space-6);
-  border-radius: var(--radius-lg);
+  background: var(--color-white);
+  padding: var(--space-5) var(--space-8);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
+  align-items: center;
+  max-width: 460px;
 }
 
-.marker-dot {
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: var(--bg-secondary);
-  border: 3px solid var(--color-lavender-soft);
-  box-shadow: 0 0 0 4px rgba(194, 184, 227, 0.2);
+.center-event:hover .event-content,
+.center-event.is-active .event-content {
+  box-shadow: var(--shadow-md);
+}
+
+.marker-dot,
+.year-dot {
+  display: none;
 }
 
 .marker-year {
   font-family: var(--font-display);
-  font-size: var(--text-sm);
+  font-size: var(--text-base);
   font-style: italic;
   color: var(--text-primary);
   white-space: nowrap;
@@ -517,19 +688,15 @@ onUnmounted(() => {
 @media (max-width: 1100px) {
   .story-timeline {
     max-width: 1000px;
-  }
-
-  .event-photo {
-    width: 260px;
-    height: 260px;
+    gap: var(--space-16);
   }
 
   .event-title {
-    font-size: var(--text-2xl);
+    font-size: var(--text-xl);
   }
 
   .event-description {
-    font-size: var(--text-base);
+    font-size: var(--text-sm);
   }
 }
 
@@ -538,35 +705,29 @@ onUnmounted(() => {
     max-width: 900px;
   }
 
-  .event-photo {
-    width: 200px;
-    height: 200px;
-  }
-
-  .event-title {
-    font-size: var(--text-lg);
-  }
-
-  .event-description {
-    font-size: var(--text-sm);
+  .event-content {
+    max-width: 280px;
   }
 }
 
-@media (max-width: 640px) {
-  .group-events {
-    flex-direction: column;
-    align-items: center;
-    gap: var(--space-8);
+@media (max-width: 768px) {
+  .story-section {
+    padding: var(--space-16) var(--space-4);
   }
 
-  .story-event {
-    width: 100%;
-    align-items: center !important;
-    text-align: center !important;
+  .story-timeline {
+    gap: var(--space-12);
+    padding-left: 80px;
   }
 
-  .event-content {
-    align-items: center !important;
+  .timeline-line {
+    left: 40px;
+    transform: none;
+  }
+
+  .story-group,
+  .center-event {
+    padding-left: 0;
   }
 
   .group-curve {
@@ -574,34 +735,122 @@ onUnmounted(() => {
   }
 
   .group-year {
-    position: relative;
-    left: auto;
-    top: auto;
-    transform: none;
-    margin-bottom: var(--space-4);
-    text-align: center;
+    position: absolute;
+    left: -40px;
+    top: 0;
+    transform: translateX(-50%);
+    margin-bottom: 0;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--space-1);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .story-group.is-active .group-year,
+  .story-group:hover .group-year {
+    transform: translateX(-50%) scale(1.1);
+  }
+
+  .group-events {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-8);
+  }
+
+  .story-event {
+    width: 100%;
+    align-items: flex-start !important;
+    text-align: left !important;
+    flex-direction: row;
+    gap: var(--space-4);
+    padding: var(--space-4);
+    background: var(--color-white);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .story-event:hover,
+  .story-event.is-active {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-md);
+  }
+
+  .event-left .event-content,
+  .event-right .event-content {
+    align-items: flex-start !important;
+    text-align: left !important;
+    background: transparent;
+    padding: 0;
+    max-width: none;
   }
 
   .event-photo {
-    width: 160px;
-    height: 160px;
+    width: 100px !important;
+    height: 100px !important;
+    flex-shrink: 0;
+  }
+
+  .center-event {
+    align-items: flex-start;
+    text-align: left;
+    padding-left: 0;
+    max-width: none;
   }
 
   .center-event .event-photo {
-    width: 180px;
-    height: 180px;
+    width: 140px !important;
+    height: 140px !important;
+  }
+
+  .center-event .event-content {
+    align-items: flex-start;
+    text-align: left;
+    padding: var(--space-4);
+    max-width: none;
+  }
+
+  .event-marker {
+    position: absolute;
+    left: -40px;
+    top: 0;
+    margin-bottom: 0;
+    transform: translateX(-50%);
+  }
+
+  .center-event:hover .event-marker,
+  .center-event.is-active .event-marker {
+    transform: translateX(-50%) scale(1.1);
+  }
+
+  /* Zoom al enfocar con scroll (mobile: evento individual) */
+  .story-event.is-focused .event-photo {
+    transform: scale(1.08);
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
   }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 480px) {
+  .story-event {
+    flex-direction: column;
+    align-items: center !important;
+    text-align: center !important;
+  }
+
+  .event-left .event-content,
+  .event-right .event-content,
+  .center-event .event-content {
+    align-items: center !important;
+    text-align: center !important;
+  }
+
   .event-photo {
-    width: 140px;
-    height: 140px;
+    width: 130px !important;
+    height: 130px !important;
   }
 
   .center-event .event-photo {
-    width: 160px;
-    height: 160px;
+    width: 160px !important;
+    height: 160px !important;
   }
 }
 </style>

@@ -6,8 +6,10 @@
     </div>
 
     <div class="hero-content">
-      <div class="hero-top reveal-text">
-        <span class="save-the-date">Nos casamos!</span>
+      <div v-if="guest" class="hero-top reveal-text">
+        <span class="guest-label">
+          Invitación para {{ guest.fullName }}
+        </span>
       </div>
 
       <div class="hero-main">
@@ -38,10 +40,11 @@
 import { computed } from 'vue'
 import { useScrollTo } from '@/composables/useScrollTo'
 import { parseWeddingDate } from '@/utils/date'
-import type { WeddingSettings } from '@/types'
+import type { WeddingSettings, Guest } from '@/types'
 
 const props = defineProps<{
   settings: WeddingSettings | null
+  guest?: Guest | null
 }>()
 
 const { scrollToSection } = useScrollTo()
@@ -108,6 +111,10 @@ const weddingYear = computed(() => weddingDate.value?.getFullYear())
 
 .hero-top {
   margin-bottom: var(--space-8);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .save-the-date {
@@ -121,6 +128,18 @@ const weddingYear = computed(() => weddingDate.value?.getFullYear())
   border: 1px solid var(--color-lavender-soft);
   border-radius: var(--radius-full);
   background: rgba(255, 255, 255, 0.5);
+}
+
+.guest-label {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: var(--text-base);
+  color: var(--text-primary);
+  padding: var(--space-2) var(--space-5);
+  background: linear-gradient(135deg, rgba(194, 184, 227, 0.25) 0%, rgba(232, 213, 196, 0.25) 100%);
+  border: 1px solid rgba(194, 184, 227, 0.5);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-sm);
 }
 
 .hero-main {

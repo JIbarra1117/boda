@@ -118,14 +118,15 @@ const save = async () => {
 
 <style scoped>
 .admin-section {
-  background: white;
+  background: var(--color-white);
   padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-sm);
 }
 
 h2 {
-  color: #2b1c43;
+  font-family: var(--font-display);
+  color: var(--color-sage);
   margin-bottom: 1.5rem;
   font-size: 1.5rem;
 }
@@ -149,39 +150,45 @@ h2 {
 }
 
 .form-group label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   text-transform: uppercase;
   letter-spacing: 0.08em;
-  color: #80849E;
+  color: var(--color-sage-light);
+  font-family: var(--font-body);
 }
 
 .form-group input {
-  padding: 0.6rem;
-  border: 1px solid #C2B8E3;
-  border-radius: 4px;
+  padding: 0.7rem;
+  border: 1px solid var(--color-lavender-soft);
+  border-radius: var(--radius-md);
   font-size: 1rem;
-  font-family: 'Lato', sans-serif;
-  color: #2b1c43;
+  font-family: var(--font-body);
+  color: var(--color-sage);
+  background: var(--color-white);
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #A0B1E3;
+  border-color: var(--color-lavender-light);
+  box-shadow: 0 0 0 3px rgba(192, 184, 227, 0.2);
 }
 
 button {
   align-self: flex-start;
   padding: 0.7rem 1.5rem;
-  background-color: #80849E;
-  color: white;
+  background-color: var(--color-sage);
+  color: var(--color-white);
   border: none;
-  border-radius: 4px;
+  border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 1rem;
+  font-family: var(--font-body);
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
 button:hover:not(:disabled) {
-  background-color: #2b1c43;
+  background-color: var(--color-sage-dark);
+  transform: translateY(-1px);
 }
 
 button:disabled {
@@ -191,17 +198,22 @@ button:disabled {
 
 .message {
   font-size: 0.95rem;
+  margin: 0;
 }
 
 .success {
-  color: #2b1c43;
+  color: var(--color-sage);
 }
 
 .error {
-  color: #c0392b;
+  color: var(--color-error);
 }
 
 @media (max-width: 640px) {
+  .admin-section {
+    padding: 1.25rem;
+  }
+
   .form-row {
     grid-template-columns: 1fr;
   }

@@ -1,4 +1,4 @@
-import type { WeddingSettings, RsvpPayload } from '@/types'
+import type { WeddingSettings, RsvpPayload, Guest, RsvpRecord } from '@/types'
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://192.168.100.175:3000'
 
@@ -48,9 +48,40 @@ export const api = {
       body: formData,
     }),
 
-  getGuests: () => fetchJson(`${API_URL}/guests`),
+  getGuests: (): Promise<Guest[]> => fetchJson(`${API_URL}/guests`),
 
-  getRsvps: () => fetchJson(`${API_URL}/rsvp`),
+  getGuestByToken: (token: string): Promise<Guest> =>
+    fetchJson(`${API_URL}/guests/by-token/${token}`),
+
+  createGuest: (data: { fullName: string; email?: string; phone?: string; maxGuests?: number }) =>
+    fetchJson(`${API_URL}/guests`, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    }),
+
+  createGuestsBulk: (
+    guests: Array<{ fullName: string; email?: string; phone?: string; maxGuests?: number }>
+  ) =>
+    fetchJson(`${API_URL}/guests/bulk`, {
+      method: 'POST',
+      body: JSON.stringify({ guests }),
+    }),
+
+  updateGuest: (
+    id: number,
+    data: { fullName?: string; email?: string; phone?: string; maxGuests?: number }
+  ) =>
+    fetchJson(`${API_URL}/guests/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(data),
+    }),
+
+  deleteGuest: (id: number) =>
+    fetchJson(`${API_URL}/guests/${id}`, {
+      method: 'DELETE',
+    }),
+
+  getRsvps: (): Promise<RsvpRecord[]> => fetchJson(`${API_URL}/rsvp`),
 
   createRsvp: (data: RsvpPayload) =>
     fetchJson(`${API_URL}/rsvp`, {

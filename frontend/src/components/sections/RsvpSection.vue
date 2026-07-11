@@ -9,93 +9,94 @@
 
       <div class="rsvp-card" ref="elementRef2" :class="{ 'is-visible': isVisible2 }">
         <Transition name="fade" mode="out-in">
-          <div v-if="success" class="success-state" key="success">
+          <div v-if="success || identifiedGuest?.hasRsvp" class="success-state" key="success">
             <div class="success-icon">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M20 6L9 17l-5-5"/>
               </svg>
             </div>
             <h3>¡Gracias!</h3>
-            <p>Tu confirmación ha sido registrada con éxito. Nos encantará verte en nuestro gran día.</p>
-            <button class="btn-secondary" @click="resetForm">Enviar otra respuesta</button>
+            <p v-if="success">Tu confirmación ha sido registrada con éxito. Nos encantará verte en nuestro gran día.</p>
+            <p v-else>Ya confirmaste tu asistencia. Nos encantará verte en nuestro gran día.</p>
+            <button class="btn-secondary" @click="resetForAnotherGuest">Confirmar otro invitado</button>
           </div>
 
           <form v-else @submit.prevent="submit" class="rsvp-form" key="form">
-            <div class="form-group">
-              <label for="guestToken">Código de invitado</label>
-              <input
-                id="guestToken"
-                v-model="form.guestToken"
-                type="text"
-                placeholder="Ingresa tu código personal"
-                required
-              />
-              <span class="input-hint">Lo encontrás en tu invitación física o digital</span>
-            </div>
-
-            <div class="form-group attendance-group">
-              <label>¿A qué eventos asistirás?</label>
-              <div class="checkbox-group">
-                <label class="checkbox-card" :class="{ checked: form.attendCeremony }">
-                  <input type="checkbox" v-model="form.attendCeremony" />
-                  <span class="check-icon"></span>
-                  <span class="checkbox-text">
-                    <strong>Ceremonia</strong>
-                    <small>Donde diremos "sí, acepto"</small>
-                  </span>
-                </label>
-
-                <label class="checkbox-card" :class="{ checked: form.attendCelebration }">
-                  <input type="checkbox" v-model="form.attendCelebration" />
-                  <span class="check-icon"></span>
-                  <span class="checkbox-text">
-                    <strong>Celebración</strong>
-                    <small>Para bailar y festejar juntos</small>
-                  </span>
-                </label>
+            <template v-if="identifiedGuest">
+              <div class="guest-welcome">
+                <span class="welcome-label">Confirmando como</span>
+                <span class="welcome-name">{{ identifiedGuest.fullName }}</span>
+                <span class="welcome-passes">Pases disponibles: {{ identifiedGuest.maxGuests }}</span>
               </div>
-            </div>
 
-            <div class="form-row">
+              <div class="form-group attendance-group">
+                <label>¿A qué eventos asistirás?</label>
+                <div class="checkbox-group">
+                  <label class="checkbox-card" :class="{ checked: form.attendCeremony }">
+                    <input type="checkbox" v-model="form.attendCeremony" />
+                    <span class="check-icon"></span>
+                    <span class="checkbox-text">
+                      <strong>Ceremonia</strong>
+                      <small>Donde diremos "sí, acepto"</small>
+                    </span>
+                  </label>
+
+                  <label class="checkbox-card" :class="{ checked: form.attendCelebration }">
+                    <input type="checkbox" v-model="form.attendCelebration" />
+                    <span class="check-icon"></span>
+                    <span class="checkbox-text">
+                      <strong>Celebración</strong>
+                      <small>Para bailar y festejar juntos</small>
+                    </span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group">
+                  <label for="numberOfGuests">Número de invitados</label>
+                  <input
+                    id="numberOfGuests"
+                    v-model.number="form.numberOfGuests"
+                    type="number"
+                    min="1"
+                    max="10"
+                    required
+                  />
+                </div>
+
+                <div class="form-group">
+                  <label for="musicSuggestion">¿Qué música no debe faltar?</label>
+                  <input
+                    id="musicSuggestion"
+                    v-model="form.musicSuggestion"
+                    type="text"
+                    placeholder="Artista - Canción"
+                  />
+                </div>
+              </div>
+
               <div class="form-group">
-                <label for="numberOfGuests">Número de invitados</label>
-                <input
-                  id="numberOfGuests"
-                  v-model.number="form.numberOfGuests"
-                  type="number"
-                  min="1"
-                  max="10"
-                  required
-                />
+                <label for="message">Mensaje para los novios</label>
+                <textarea
+                  id="message"
+                  v-model="form.message"
+                  rows="4"
+                  placeholder="Déjanos un mensaje de amor y buenos deseos..."
+                ></textarea>
               </div>
 
-              <div class="form-group">
-                <label for="musicSuggestion">¿Qué música no debe faltar?</label>
-                <input
-                  id="musicSuggestion"
-                  v-model="form.musicSuggestion"
-                  type="text"
-                  placeholder="Artista - Canción"
-                />
-              </div>
+              <button type="submit" class="btn-primary" :disabled="loading">
+                <span v-if="loading" class="spinner"></span>
+                <span>{{ loading ? 'Enviando...' : 'Confirmar asistencia' }}</span>
+              </button>
+
+              <p v-if="error" class="message error">{{ error }}</p>
+            </template>
+
+            <div v-else class="guest-hint">
+              <p>Para confirmar tu asistencia, ingresa a tu invitación desde el enlace o QR que recibiste.</p>
             </div>
-
-            <div class="form-group">
-              <label for="message">Mensaje para los novios</label>
-              <textarea
-                id="message"
-                v-model="form.message"
-                rows="4"
-                placeholder="Déjanos un mensaje de amor y buenos deseos..."
-              ></textarea>
-            </div>
-
-            <button type="submit" class="btn-primary" :disabled="loading">
-              <span v-if="loading" class="spinner"></span>
-              <span>{{ loading ? 'Enviando...' : 'Confirmar asistencia' }}</span>
-            </button>
-
-            <p v-if="error" class="message error">{{ error }}</p>
           </form>
         </Transition>
       </div>
@@ -104,16 +105,24 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref } from 'vue'
+import { reactive, ref, watch } from 'vue'
 import { api } from '@/api/api'
 import { useScrollReveal } from '@/composables/useScrollReveal'
-import type { RsvpPayload } from '@/types'
+import type { RsvpPayload, Guest } from '@/types'
+
+const props = defineProps<{
+  guest?: Guest | null
+}>()
+
+const emit = defineEmits<{
+  'guest-identified': [guest: Guest | null]
+}>()
 
 const { elementRef, isVisible } = useScrollReveal()
 const { elementRef: elementRef2, isVisible: isVisible2 } = useScrollReveal()
 
 const form = reactive<RsvpPayload>({
-  guestToken: '',
+  guestToken: props.guest?.token || '',
   attendCeremony: false,
   attendCelebration: false,
   numberOfGuests: 1,
@@ -124,6 +133,10 @@ const form = reactive<RsvpPayload>({
 const loading = ref(false)
 const success = ref(false)
 const error = ref('')
+const identifiedGuest = ref<Guest | null>(props.guest || null)
+const identifying = ref(false)
+const notFound = ref(false)
+let identifyTimeout: ReturnType<typeof setTimeout> | null = null
 
 const submit = async () => {
   loading.value = true
@@ -140,6 +153,9 @@ const submit = async () => {
       message: form.message,
     })
     success.value = true
+    if (identifiedGuest.value) {
+      identifiedGuest.value.hasRsvp = true
+    }
     resetFormValues()
   } catch (e: any) {
     error.value = e.message || 'Error al enviar la confirmación. Por favor intentá de nuevo.'
@@ -149,7 +165,7 @@ const submit = async () => {
 }
 
 const resetFormValues = () => {
-  form.guestToken = ''
+  form.guestToken = props.guest?.token || ''
   form.attendCeremony = false
   form.attendCelebration = false
   form.numberOfGuests = 1
@@ -157,9 +173,47 @@ const resetFormValues = () => {
   form.message = ''
 }
 
-const resetForm = () => {
+watch(() => props.guest, (guest) => {
+  if (guest && !success.value) {
+    form.guestToken = guest.token
+    identifiedGuest.value = guest
+  }
+}, { immediate: true })
+
+watch(() => form.guestToken, (token) => {
+  if (identifyTimeout) clearTimeout(identifyTimeout)
+  notFound.value = false
+
+  const trimmed = token.trim()
+  if (!trimmed) {
+    identifiedGuest.value = null
+    emit('guest-identified', null)
+    return
+  }
+
+  identifying.value = true
+  identifyTimeout = setTimeout(async () => {
+    try {
+      const guest = await api.getGuestByToken(trimmed)
+      identifiedGuest.value = guest
+      emit('guest-identified', guest)
+      notFound.value = false
+    } catch {
+      identifiedGuest.value = null
+      emit('guest-identified', null)
+      notFound.value = true
+    } finally {
+      identifying.value = false
+    }
+  }, 400)
+})
+
+const resetForAnotherGuest = () => {
   success.value = false
   error.value = ''
+  form.guestToken = ''
+  identifiedGuest.value = null
+  emit('guest-identified', null)
 }
 </script>
 
@@ -459,6 +513,60 @@ const resetForm = () => {
   color: var(--text-secondary);
   font-style: italic;
   margin: 0;
+}
+
+.guest-welcome {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+  margin-bottom: var(--space-6);
+  padding: var(--space-4) var(--space-6);
+  background: linear-gradient(135deg, rgba(194, 184, 227, 0.2) 0%, rgba(232, 213, 196, 0.2) 100%);
+  border: 1px solid rgba(194, 184, 227, 0.4);
+  border-radius: var(--radius-xl);
+  text-align: center;
+}
+
+.welcome-label {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  color: var(--text-muted);
+}
+
+.welcome-name {
+  font-family: var(--font-display);
+  font-size: var(--text-2xl);
+  color: var(--text-primary);
+}
+
+.welcome-passes {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+}
+
+.guest-not-found {
+  margin-bottom: var(--space-6);
+  padding: var(--space-4);
+  background: rgba(184, 92, 92, 0.08);
+  border: 1px solid rgba(184, 92, 92, 0.2);
+  border-radius: var(--radius-lg);
+  color: var(--color-error);
+  font-size: var(--text-sm);
+  text-align: center;
+}
+
+.guest-hint {
+  padding: var(--space-8) var(--space-4);
+  text-align: center;
+  color: var(--text-secondary);
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-style: italic;
+  line-height: 1.6;
 }
 
 /* Transiciones */
