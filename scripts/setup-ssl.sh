@@ -4,7 +4,7 @@ set -e
 DOMAIN="karenyjorge.jorgeibarra.dev"
 EMAIL="jorgeluisibarralucas@gmail.com"
 
-PROJECT_DIR="/opt/boda"
+PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
 
 echo "Instalando Certbot..."
 
