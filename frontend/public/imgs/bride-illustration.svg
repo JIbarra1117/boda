@@ -1,0 +1,23 @@
+<svg viewBox="0 0 260 380" xmlns="http://www.w3.org/2000/svg">
+  <!-- Cabello (detrás del marco) -->
+  <path d="M60 130 Q130 25 200 130 Q210 190 185 225 Q130 205 75 225 Q50 190 60 130" fill="#4A403A"/>
+
+  <!-- Cuello extendido para conectar con la foto del rostro -->
+  <path d="M115 150 L115 200 Q130 208 145 200 L145 150 Z" fill="#E8D5C4"/>
+
+  <!-- Vestido (empieza justo debajo del marco, en y=195) -->
+  <path d="M95 195 Q130 215 165 195 L205 380 L55 380 Z" fill="#EBE7E5"/>
+  <!-- Escote -->
+  <path d="M95 195 Q130 220 165 195" fill="none" stroke="#E0DCDA" stroke-width="1"/>
+
+  <!-- Manos sosteniendo el marco -->
+  <ellipse cx="58" cy="170" rx="13" ry="18" fill="#E8D5C4"/>
+  <ellipse cx="202" cy="170" rx="13" ry="18" fill="#E8D5C4"/>
+
+  <!-- Flequillo visible arriba del marco -->
+  <path d="M92 95 Q130 70 168 95 Q130 85 92 95" fill="#4A403A"/>
+
+  <!-- Marco Polaroid (borde) - centro transparente para la foto real -->
+  <rect x="60" y="45" width="140" height="150" fill="none" stroke="#C2B8E3" stroke-width="5" rx="2"/>
+  <rect x="65" y="50" width="130" height="140" fill="none" stroke="#A0B1E3" stroke-width="1" rx="1"/>
+</svg>

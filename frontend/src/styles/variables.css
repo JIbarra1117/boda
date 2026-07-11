@@ -1,0 +1,104 @@
+/* Sistema de diseño: elegante clásico romántico */
+
+:root {
+  /* Paleta de colores */
+  --color-cream: #FAF8F5;
+  --color-champagne: #F3EFE9;
+  --color-sand: #EBE7E5;
+  --color-sage: #2b1c43;
+  --color-sage-dark: #1a1129;
+  --color-sage-light: #6d5f82;
+  --color-lavender: #80849E;
+  --color-lavender-light: #A0B1E3;
+  --color-lavender-soft: #C2B8E3;
+  --color-blush: #E8D5C4;
+  --color-rose: #D4A5A5;
+  --color-gold: #C9B99A;
+  --color-charcoal: #4A403A;
+  --color-white: #FFFFFF;
+  --color-error: #B85C5C;
+  --color-success: #2b1c43;
+
+  /* Fondos */
+  --bg-primary: var(--color-cream);
+  --bg-secondary: var(--color-champagne);
+  --bg-accent: var(--color-sand);
+
+  /* Texto */
+  --text-primary: var(--color-sage);
+  --text-secondary: var(--color-lavender);
+  --text-accent: var(--color-lavender-light);
+  --text-dark: var(--color-charcoal);
+  --text-muted: var(--color-sage-light);
+
+  /* Tipografía */
+  --font-display: 'Playfair Display', 'Cormorant Garamond', serif;
+  --font-serif: 'Cormorant Garamond', 'Playfair Display', serif;
+  --font-script: 'Great Vibes', cursive;
+  --font-body: 'Lato', sans-serif;
+
+  /* Tamaños de fuente */
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.5rem;
+  --text-6xl: 4.5rem;
+  --text-7xl: 6rem;
+
+  /* Espaciado */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Radios */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Sombras */
+  --shadow-sm: 0 2px 8px rgba(74, 64, 58, 0.06);
+  --shadow-md: 0 8px 24px rgba(74, 64, 58, 0.08);
+  --shadow-lg: 0 16px 48px rgba(74, 64, 58, 0.12);
+  --shadow-glow: 0 0 40px rgba(192, 184, 227, 0.25);
+
+  /* Transiciones */
+  --transition-fast: 0.2s ease;
+  --transition-base: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  --transition-bounce: 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  /* Layout */
+  --max-width: 1200px;
+  --max-width-content: 720px;
+  --header-height: 64px;
+}
+
+@media (max-width: 640px) {
+  :root {
+    --text-3xl: 1.75rem;
+    --text-4xl: 2rem;
+    --text-5xl: 2.5rem;
+    --text-6xl: 3rem;
+    --text-7xl: 3.5rem;
+    --space-12: 2rem;
+    --space-16: 3rem;
+    --space-20: 4rem;
+    --space-24: 5rem;
+  }
+}

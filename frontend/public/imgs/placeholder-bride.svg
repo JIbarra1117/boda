@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <linearGradient id="brideGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FAF8F5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F3EFE9;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#brideGrad)"/>
+  <!-- Silueta arriba para que se vea dentro del marco polaroid -->
+  <circle cx="100" cy="55" r="28" fill="#E8D5C4" opacity="0.6"/>
+  <path d="M100 85 C75 85 62 105 62 132 L138 132 C138 105 125 85 100 85Z" fill="#E8D5C4" opacity="0.4"/>
+  <text x="100" y="100" font-family="'Great Vibes', cursive" font-size="24" fill="#80849E" text-anchor="middle">Ella</text>
+  <text x="100" y="125" font-family="'Lato', sans-serif" font-size="9" fill="#A0B1E3" text-anchor="middle" letter-spacing="2">FOTO DE NIÑA</text>
+</svg>

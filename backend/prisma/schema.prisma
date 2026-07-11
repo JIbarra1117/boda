@@ -1,0 +1,54 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Settings {
+  id                 Int      @id @default(autoincrement())
+  weddingDate        DateTime @map("wedding_date")
+  weddingTime        String   @map("wedding_time")
+  bankAccountNumber  String   @map("bank_account_number")
+  bankAccountName    String   @map("bank_account_name")
+  bankName           String   @map("bank_name")
+  brideName          String   @default("Karen Mejía") @map("bride_name")
+  groomName          String   @default("Jorge Ibarra") @map("groom_name")
+  polaroidBrideImage String?  @map("polaroid_bride_image")
+  polaroidGroomImage String?  @map("polaroid_groom_image")
+  backgroundMusic    String?  @map("background_music")
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+model Guest {
+  id        Int      @id @default(autoincrement())
+  fullName  String   @map("full_name")
+  email     String?
+  phone     String?
+  maxGuests Int      @default(1) @map("max_guests")
+  token     String   @unique @default(uuid())
+  hasRsvp   Boolean  @default(false) @map("has_rsvp")
+  createdAt DateTime @default(now()) @map("created_at")
+  rsvp      Rsvp?
+
+  @@map("guests")
+}
+
+model Rsvp {
+  id                Int      @id @default(autoincrement())
+  guestId           Int      @unique @map("guest_id")
+  guest             Guest    @relation(fields: [guestId], references: [id])
+  attendCeremony    Boolean  @map("attend_ceremony")
+  attendCelebration Boolean  @map("attend_celebration")
+  numberOfGuests    Int      @default(1) @map("number_of_guests")
+  musicSuggestion   String?  @map("music_suggestion")
+  message           String?
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  @@map("rsvps")
+}

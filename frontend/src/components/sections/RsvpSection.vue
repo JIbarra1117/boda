@@ -1,0 +1,489 @@
+<template>
+  <section id="rsvp" class="rsvp-section">
+    <div class="rsvp-content">
+      <div class="section-header" ref="elementRef" :class="{ 'is-visible': isVisible }">
+        <span class="section-label">Reserva tu lugar</span>
+        <h2 class="section-title">Confirma tu Asistencia</h2>
+        <p class="section-subtitle">Tu presencia es el mejor regalo que podemos recibir</p>
+      </div>
+
+      <div class="rsvp-card" ref="elementRef2" :class="{ 'is-visible': isVisible2 }">
+        <Transition name="fade" mode="out-in">
+          <div v-if="success" class="success-state" key="success">
+            <div class="success-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20 6L9 17l-5-5"/>
+              </svg>
+            </div>
+            <h3>¡Gracias!</h3>
+            <p>Tu confirmación ha sido registrada con éxito. Nos encantará verte en nuestro gran día.</p>
+            <button class="btn-secondary" @click="resetForm">Enviar otra respuesta</button>
+          </div>
+
+          <form v-else @submit.prevent="submit" class="rsvp-form" key="form">
+            <div class="form-group">
+              <label for="guestToken">Código de invitado</label>
+              <input
+                id="guestToken"
+                v-model="form.guestToken"
+                type="text"
+                placeholder="Ingresa tu código personal"
+                required
+              />
+              <span class="input-hint">Lo encontrás en tu invitación física o digital</span>
+            </div>
+
+            <div class="form-group attendance-group">
+              <label>¿A qué eventos asistirás?</label>
+              <div class="checkbox-group">
+                <label class="checkbox-card" :class="{ checked: form.attendCeremony }">
+                  <input type="checkbox" v-model="form.attendCeremony" />
+                  <span class="check-icon"></span>
+                  <span class="checkbox-text">
+                    <strong>Ceremonia</strong>
+                    <small>Donde diremos "sí, acepto"</small>
+                  </span>
+                </label>
+
+                <label class="checkbox-card" :class="{ checked: form.attendCelebration }">
+                  <input type="checkbox" v-model="form.attendCelebration" />
+                  <span class="check-icon"></span>
+                  <span class="checkbox-text">
+                    <strong>Celebración</strong>
+                    <small>Para bailar y festejar juntos</small>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="numberOfGuests">Número de invitados</label>
+                <input
+                  id="numberOfGuests"
+                  v-model.number="form.numberOfGuests"
+                  type="number"
+                  min="1"
+                  max="10"
+                  required
+                />
+              </div>
+
+              <div class="form-group">
+                <label for="musicSuggestion">¿Qué música no debe faltar?</label>
+                <input
+                  id="musicSuggestion"
+                  v-model="form.musicSuggestion"
+                  type="text"
+                  placeholder="Artista - Canción"
+                />
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="message">Mensaje para los novios</label>
+              <textarea
+                id="message"
+                v-model="form.message"
+                rows="4"
+                placeholder="Déjanos un mensaje de amor y buenos deseos..."
+              ></textarea>
+            </div>
+
+            <button type="submit" class="btn-primary" :disabled="loading">
+              <span v-if="loading" class="spinner"></span>
+              <span>{{ loading ? 'Enviando...' : 'Confirmar asistencia' }}</span>
+            </button>
+
+            <p v-if="error" class="message error">{{ error }}</p>
+          </form>
+        </Transition>
+      </div>
+    </div>
+  </section>
+</template>
+
+<script setup lang="ts">
+import { reactive, ref } from 'vue'
+import { api } from '@/api/api'
+import { useScrollReveal } from '@/composables/useScrollReveal'
+import type { RsvpPayload } from '@/types'
+
+const { elementRef, isVisible } = useScrollReveal()
+const { elementRef: elementRef2, isVisible: isVisible2 } = useScrollReveal()
+
+const form = reactive<RsvpPayload>({
+  guestToken: '',
+  attendCeremony: false,
+  attendCelebration: false,
+  numberOfGuests: 1,
+  musicSuggestion: '',
+  message: '',
+})
+
+const loading = ref(false)
+const success = ref(false)
+const error = ref('')
+
+const submit = async () => {
+  loading.value = true
+  success.value = false
+  error.value = ''
+
+  try {
+    await api.createRsvp({
+      guestToken: form.guestToken.trim(),
+      attendCeremony: form.attendCeremony,
+      attendCelebration: form.attendCelebration,
+      numberOfGuests: form.numberOfGuests,
+      musicSuggestion: form.musicSuggestion,
+      message: form.message,
+    })
+    success.value = true
+    resetFormValues()
+  } catch (e: any) {
+    error.value = e.message || 'Error al enviar la confirmación. Por favor intentá de nuevo.'
+  } finally {
+    loading.value = false
+  }
+}
+
+const resetFormValues = () => {
+  form.guestToken = ''
+  form.attendCeremony = false
+  form.attendCelebration = false
+  form.numberOfGuests = 1
+  form.musicSuggestion = ''
+  form.message = ''
+}
+
+const resetForm = () => {
+  success.value = false
+  error.value = ''
+}
+</script>
+
+<style scoped>
+.rsvp-section {
+  padding: var(--space-24) var(--space-6);
+  background: var(--bg-secondary);
+}
+
+.rsvp-content {
+  max-width: var(--max-width-content);
+  margin: 0 auto;
+}
+
+.section-header {
+  text-align: center;
+  margin-bottom: var(--space-10);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.section-header.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.section-label {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: var(--text-muted);
+  margin-bottom: var(--space-4);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: var(--text-4xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.section-subtitle {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  font-style: italic;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.rsvp-card {
+  background: var(--color-white);
+  border: 1px solid var(--color-lavender-soft);
+  border-radius: var(--radius-xl);
+  padding: var(--space-10);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+}
+
+.rsvp-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.rsvp-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.form-group label {
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.form-group input,
+.form-group textarea {
+  padding: var(--space-4);
+  border: 1px solid var(--color-sand);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--text-dark);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: var(--color-lavender-soft);
+  box-shadow: 0 0 0 3px rgba(192, 184, 227, 0.15);
+}
+
+.input-hint {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: var(--space-4);
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--space-3);
+}
+
+.checkbox-card {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--color-sand);
+  border-radius: var(--radius-md);
+  background: var(--bg-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.checkbox-card:hover {
+  border-color: var(--color-lavender-soft);
+}
+
+.checkbox-card.checked {
+  border-color: var(--text-accent);
+  background: rgba(160, 177, 227, 0.08);
+}
+
+.checkbox-card input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.check-icon {
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  border: 2px solid var(--color-lavender-soft);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.checkbox-card.checked .check-icon {
+  background: var(--text-accent);
+  border-color: var(--text-accent);
+}
+
+.checkbox-card.checked .check-icon::after {
+  content: '✓';
+  color: var(--color-white);
+  font-size: 14px;
+}
+
+.checkbox-text {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkbox-text strong {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.checkbox-text small {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-8);
+  background: var(--text-primary);
+  color: var(--color-white);
+  border: none;
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all var(--transition-fast);
+  margin-top: var(--space-2);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--color-sage-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-primary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.btn-secondary {
+  display: inline-block;
+  padding: var(--space-3) var(--space-6);
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--text-primary);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--text-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all var(--transition-fast);
+  margin-top: var(--space-4);
+}
+
+.btn-secondary:hover {
+  background: var(--text-primary);
+  color: var(--color-white);
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: var(--color-white);
+  border-radius: var(--radius-full);
+  animation: spin 0.8s linear infinite;
+}
+
+.message {
+  text-align: center;
+  font-size: var(--text-sm);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+}
+
+.message.error {
+  color: var(--color-error);
+  background: rgba(184, 92, 92, 0.08);
+}
+
+.success-state {
+  text-align: center;
+  padding: var(--space-8) var(--space-4);
+}
+
+.success-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto var(--space-6);
+  background: var(--color-success);
+  color: var(--color-white);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.success-icon svg {
+  width: 36px;
+  height: 36px;
+}
+
+.success-state h3 {
+  font-family: var(--font-display);
+  font-size: var(--text-3xl);
+  color: var(--text-primary);
+  margin-bottom: var(--space-4);
+}
+
+.success-state p {
+  font-family: var(--font-serif);
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  font-style: italic;
+  margin: 0;
+}
+
+/* Transiciones */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+@media (max-width: 640px) {
+  .form-row {
+    grid-template-columns: 1fr;
+  }
+
+  .checkbox-group {
+    grid-template-columns: 1fr;
+  }
+
+  .rsvp-card {
+    padding: var(--space-6) var(--space-4);
+  }
+}
+</style>

@@ -1,0 +1,38 @@
+<svg viewBox="0 0 260 380" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="traje" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9C8B7A;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#B8A99A;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Cabello (detrás del marco) -->
+  <path d="M60 125 Q130 30 200 125 Q210 160 190 190 Q130 170 70 190 Q50 160 60 125" fill="#4A403A"/>
+
+  <!-- Cuello extendido para conectar con la foto del rostro -->
+  <path d="M112 155 L112 205 Q130 212 148 205 L148 155 Z" fill="#E8D5C4"/>
+
+  <!-- Camisa -->
+  <polygon points="130,205 78,245 182,245" fill="#EBE7E5"/>
+  <!-- Botones -->
+  <circle cx="130" cy="220" r="2" fill="#A0B1E3"/>
+  <circle cx="130" cy="230" r="2" fill="#A0B1E3"/>
+
+  <!-- Pajarita -->
+  <polygon points="130,210 118,220 130,217 142,220" fill="#6D7765"/>
+
+  <!-- Traje (empieza justo debajo del marco/camisa) -->
+  <path d="M78 245 L50 380 L210 380 L182 245 Z" fill="url(#traje)"/>
+  <!-- Solapa izquierda -->
+  <polygon points="78,245 130,310 130,380 50,380" fill="#8E7D6B"/>
+  <!-- Solapa derecha -->
+  <polygon points="182,245 130,310 130,380 210,380" fill="#8E7D6B"/>
+
+  <!-- Manos sosteniendo el marco -->
+  <ellipse cx="58" cy="170" rx="13" ry="18" fill="#E8D5C4"/>
+  <ellipse cx="202" cy="170" rx="13" ry="18" fill="#E8D5C4"/>
+
+  <!-- Marco Polaroid (borde) - centro transparente para la foto real -->
+  <rect x="60" y="45" width="140" height="150" fill="none" stroke="#C2B8E3" stroke-width="5" rx="2"/>
+  <rect x="65" y="50" width="130" height="140" fill="none" stroke="#A0B1E3" stroke-width="1" rx="1"/>
+</svg>

@@ -1,0 +1,30 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / editors
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# Docker volumes and temp
+.dockerignore
+
+# Uploads (user content, not source code)
+/uploads/
+/backend/uploads/
+
+# Build outputs (fallback)
+**/dist/
+**/build/
