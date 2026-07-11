@@ -149,5 +149,9 @@ export const generateGuestQrPng = async (
 }
 
 export const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_APP_URL
+  if (envUrl && typeof envUrl === 'string') {
+    return envUrl.replace(/\/$/, '')
+  }
   return window.location.origin
 }

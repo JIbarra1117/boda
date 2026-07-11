@@ -80,6 +80,8 @@ El archivo `.env` en la raíz del proyecto contiene las configuraciones. Ejemplo
 ```env
 ADMIN_PASSWORD=boda2026
 DATABASE_URL=postgresql://boda_user:boda_password@db:5432/boda_db?schema=public
+VITE_API_URL=http://localhost:3000
+VITE_APP_URL=http://localhost:5173
 ```
 
 En producción, al menos debés cambiar:
@@ -87,7 +89,8 @@ En producción, al menos debés cambiar:
 - `ADMIN_PASSWORD`
 - Credenciales de PostgreSQL
 - `DATABASE_URL` del backend
-- `VITE_API_URL` del frontend para apuntar al dominio real
+- `VITE_API_URL` del frontend para apuntar al backend en producción
+- `VITE_APP_URL` del frontend para apuntar al dominio público de la invitación (usado en los QRs y links)
 
 ---
 
@@ -103,15 +106,18 @@ Necesitás un servidor con:
 
 ### 2. Configurar el dominio en el frontend
 
-Editá `docker-compose.yml` (o usá un `.env` si lo referenciás) para que `VITE_API_URL` apunte al dominio real:
+Editá `docker-compose.yml` (o usá un `.env` si lo referenciás) para que las URLs apunten al dominio real:
 
 ```yaml
 frontend:
   environment:
     - VITE_API_URL=https://api.tuboda.com
+    - VITE_APP_URL=https://tuboda.com
 ```
 
-> ⚠️ Los códigos QR generados en local apuntan a `localhost`. En producción hay que regenerarlos desde el panel de administración después de cambiar `VITE_API_URL`.
+> ⚠️ `VITE_APP_URL` es la URL que se embebe en los códigos QR y en los links de invitación. Si no está definida, el sistema usa el origen del navegador (`window.location.origin`), lo cual puede generar QRs con `localhost` si los descargás en desarrollo.
+>
+> En producción, configurá `VITE_APP_URL` con el dominio público y regenerá los QRs desde el panel de administración.
 
 ### 3. Cambiar contraseñas y secretos
 
@@ -249,7 +255,8 @@ docker compose up --build -d
 
 - [ ] Cambiar `ADMIN_PASSWORD`
 - [ ] Cambiar credenciales de PostgreSQL
-- [ ] Configurar `VITE_API_URL` con el dominio real
+- [ ] Configurar `VITE_API_URL` con el dominio real del backend
+- [ ] Configurar `VITE_APP_URL` con el dominio público de la invitación
 - [ ] Asegurarse de que la base de datos esté expuesta solo si es necesario
 - [ ] Configurar HTTPS (certificado SSL)
 - [ ] Regenerar QRs con el dominio de producción
