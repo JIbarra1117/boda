@@ -7,7 +7,7 @@
       class="qr-link"
       :title="`Abrir invitación de ${guest.fullName}`"
     >
-      <canvas ref="canvasRef" width="600" height="900" class="qr-canvas"></canvas>
+      <canvas ref="canvasRef" width="480" height="480" class="qr-canvas"></canvas>
     </a>
     <div class="qr-actions">
       <button class="btn-primary" @click="download" :disabled="!ready">
@@ -27,7 +27,7 @@
 
 <script setup lang="ts">
 import { ref, watch, onMounted } from 'vue'
-import { drawGuestQrCard } from '@/composables/useGuestQr'
+import { drawGuestQr } from '@/composables/useGuestQr'
 import type { Guest } from '@/types'
 
 const props = defineProps<{
@@ -47,7 +47,7 @@ const drawCard = async () => {
   const ctx = canvas.getContext('2d')
   if (!ctx) return
 
-  await drawGuestQrCard(ctx, props.guest, props.baseUrl, canvas.width, canvas.height)
+  await drawGuestQr(ctx, props.guest, props.baseUrl, canvas.width)
   ready.value = true
 }
 

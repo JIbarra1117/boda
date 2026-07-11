@@ -1,8 +1,21 @@
 import QRCode from 'qrcode'
 import type { Guest } from '@/types'
 
-const LOGO_SIZE = 80
-const QR_SIZE = 320
+const QR_SIZE = 400
+const CANVAS_SIZE = 480
+const LOGO_SIZE = 90
+const LOGO_RADIUS = 12
+const QR_RADIUS = 24
+
+const loadImage = (src: string): Promise<HTMLImageElement> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = reject
+    img.src = src
+  })
+}
 
 const drawRoundedRect = (
   ctx: CanvasRenderingContext2D,
@@ -25,100 +38,30 @@ const drawRoundedRect = (
   ctx.closePath()
 }
 
-const wrapText = (
-  ctx: CanvasRenderingContext2D,
-  text: string,
-  x: number,
-  y: number,
-  maxWidth: number,
-  lineHeight: number
-) => {
-  const words = text.split(' ')
-  let line = ''
-  let currentY = y
-
-  for (let i = 0; i < words.length; i++) {
-    const testLine = line + words[i] + ' '
-    const metrics = ctx.measureText(testLine)
-    if (metrics.width > maxWidth && i > 0) {
-      ctx.fillText(line.trim(), x, currentY)
-      line = words[i] + ' '
-      currentY += lineHeight
-    } else {
-      line = testLine
-    }
-  }
-  ctx.fillText(line.trim(), x, currentY)
-}
-
-const loadImage = (src: string): Promise<HTMLImageElement> => {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => resolve(img)
-    img.onerror = reject
-    img.src = src
-  })
-}
-
-export const drawGuestQrCard = async (
+export const drawGuestQr = async (
   ctx: CanvasRenderingContext2D,
   guest: Guest,
   baseUrl: string,
-  width: number,
-  height: number
+  size: number = CANVAS_SIZE
 ) => {
-  // Fondo
-  const gradient = ctx.createLinearGradient(0, 0, width, height)
-  gradient.addColorStop(0, '#FAF8F5')
-  gradient.addColorStop(0.5, '#FFFFFF')
-  gradient.addColorStop(1, '#F3EFE9')
-  ctx.fillStyle = gradient
-  ctx.fillRect(0, 0, width, height)
+  const padding = (size - QR_SIZE) / 2
 
-  // Marco
-  ctx.strokeStyle = 'rgba(194, 184, 227, 0.6)'
-  ctx.lineWidth = 3
-  drawRoundedRect(ctx, 30, 30, width - 60, height - 60, 32)
-  ctx.stroke()
+  // Fondo transparente
+  ctx.clearRect(0, 0, size, size)
 
-  ctx.strokeStyle = 'rgba(194, 184, 227, 0.3)'
-  ctx.lineWidth = 1
-  drawRoundedRect(ctx, 42, 42, width - 84, height - 84, 24)
-  ctx.stroke()
+  // Fondo blanco del QR con esquinas redondeadas
+  ctx.fillStyle = '#FFFFFF'
+  drawRoundedRect(ctx, padding, padding, QR_SIZE, QR_SIZE, QR_RADIUS)
+  ctx.fill()
 
-  // Nombres
-  ctx.fillStyle = '#2b1c43'
-  ctx.font = 'italic 500 46px "Playfair Display", "Cormorant Garamond", serif'
-  ctx.textAlign = 'center'
-  ctx.fillText('Karen & Jorge', width / 2, 130)
-
-  // Línea decorativa
-  ctx.strokeStyle = '#C2B8E3'
-  ctx.lineWidth = 1
-  ctx.beginPath()
-  ctx.moveTo(width / 2 - 80, 155)
-  ctx.lineTo(width / 2 + 80, 155)
-  ctx.stroke()
-
-  // Etiqueta
-  ctx.fillStyle = '#6d5f82'
-  ctx.font = '600 18px "Lato", sans-serif'
-  ctx.fillText('INVITACIÓN PARA', width / 2, 215)
-
-  // Nombre
-  ctx.fillStyle = '#2b1c43'
-  ctx.font = '500 42px "Playfair Display", "Cormorant Garamond", serif'
-  wrapText(ctx, guest.fullName, width / 2, 280, 480, 50)
-
-  // QR
+  // Generar QR
   const inviteUrl = `${baseUrl}?guest=${guest.token}`
   const qrDataUrl = await QRCode.toDataURL(inviteUrl, {
     width: QR_SIZE,
-    margin: 2,
+    margin: 0,
     color: {
       dark: '#2b1c43',
-      light: '#FFFFFF',
+      light: '#FFFFFF00', // transparente
     },
   })
 
@@ -126,46 +69,32 @@ export const drawGuestQrCard = async (
   qrImage.src = qrDataUrl
   await new Promise<void>((resolve) => (qrImage.onload = () => resolve()))
 
-  const qrX = width / 2 - QR_SIZE / 2 - 15
-  const qrY = 395
-  const qrBgSize = QR_SIZE + 30
+  // Recortar el QR dentro del rectángulo redondeado
+  ctx.save()
+  drawRoundedRect(ctx, padding, padding, QR_SIZE, QR_SIZE, QR_RADIUS)
+  ctx.clip()
+  ctx.drawImage(qrImage, padding, padding, QR_SIZE, QR_SIZE)
+  ctx.restore()
 
-  ctx.fillStyle = '#FFFFFF'
-  drawRoundedRect(ctx, qrX, qrY - 15, qrBgSize, qrBgSize, 24)
-  ctx.fill()
-
-  ctx.drawImage(qrImage, qrX + 15, qrY, QR_SIZE, QR_SIZE)
-
-  // Logo en el centro del QR
+  // Logo en el centro
   try {
     const logo = await loadImage('/imgs/kj-transparent.png')
-    const logoX = qrX + 15 + QR_SIZE / 2 - LOGO_SIZE / 2
-    const logoY = qrY + QR_SIZE / 2 - LOGO_SIZE / 2
+    const logoX = padding + QR_SIZE / 2 - LOGO_SIZE / 2
+    const logoY = padding + QR_SIZE / 2 - LOGO_SIZE / 2
 
-    // Fondo blanco circular detrás del logo
-    ctx.beginPath()
-    ctx.arc(logoX + LOGO_SIZE / 2, logoY + LOGO_SIZE / 2, LOGO_SIZE / 2 + 6, 0, Math.PI * 2)
+    // Fondo blanco cuadrado con esquinas redondeadas detrás del logo
     ctx.fillStyle = '#FFFFFF'
+    drawRoundedRect(ctx, logoX - 4, logoY - 4, LOGO_SIZE + 8, LOGO_SIZE + 8, LOGO_RADIUS)
     ctx.fill()
 
+    ctx.save()
+    drawRoundedRect(ctx, logoX, logoY, LOGO_SIZE, LOGO_SIZE, LOGO_RADIUS - 4)
+    ctx.clip()
     ctx.drawImage(logo, logoX, logoY, LOGO_SIZE, LOGO_SIZE)
+    ctx.restore()
   } catch {
     // Si el logo no carga, el QR sigue funcionando
   }
-
-  // Instrucciones
-  ctx.fillStyle = '#6d5f82'
-  ctx.font = '400 20px "Lato", sans-serif'
-  ctx.fillText('Escanea para abrir tu invitación', width / 2, 790)
-
-  // Código
-  ctx.fillStyle = '#80849E'
-  ctx.font = '600 16px "Lato", sans-serif'
-  ctx.fillText('O ingresa este código:', width / 2, 830)
-
-  ctx.fillStyle = '#2b1c43'
-  ctx.font = '28px "SF Mono", Monaco, "Cascadia Code", monospace'
-  ctx.fillText(guest.code || guest.token, width / 2, 865)
 }
 
 export const generateGuestQrPng = async (
@@ -173,13 +102,13 @@ export const generateGuestQrPng = async (
   baseUrl: string
 ): Promise<Blob> => {
   const canvas = document.createElement('canvas')
-  canvas.width = 600
-  canvas.height = 900
+  canvas.width = CANVAS_SIZE
+  canvas.height = CANVAS_SIZE
 
   const ctx = canvas.getContext('2d')
   if (!ctx) throw new Error('No se pudo obtener el contexto del canvas')
 
-  await drawGuestQrCard(ctx, guest, baseUrl, canvas.width, canvas.height)
+  await drawGuestQr(ctx, guest, baseUrl, CANVAS_SIZE)
 
   return new Promise((resolve) => {
     canvas.toBlob((blob) => {
