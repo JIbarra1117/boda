@@ -3,6 +3,8 @@ import type { Guest } from '@/types'
 
 const QR_SIZE = 400
 const QR_MARGIN = 20
+const QR_COLOR = '#B8860B' // Dorado oscuro
+const LOGO_PATH = '/imgs/kj-transparent.png'
 
 const createQr = (data: string, size: number = QR_SIZE) => {
   return new (QRCodeStyling as any)({
@@ -13,8 +15,15 @@ const createQr = (data: string, size: number = QR_SIZE) => {
     qrOptions: {
       errorCorrectionLevel: 'H',
     },
+    image: LOGO_PATH,
+    imageOptions: {
+      crossOrigin: 'anonymous',
+      margin: 4,
+      imageSize: 0.25,
+      hideBackgroundDots: true,
+    },
     dotsOptions: {
-      color: '#000000',
+      color: QR_COLOR,
       type: 'rounded',
     },
     backgroundOptions: {
