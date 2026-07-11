@@ -43,6 +43,7 @@ services:
     environment:
       VITE_API_URL: ${VITE_API_URL:-https://karenyjorge.jorgeibarra.dev/api}
       VITE_APP_URL: ${VITE_APP_URL:-https://karenyjorge.jorgeibarra.dev}
+      VITE_ADMIN_PASSWORD: ${ADMIN_PASSWORD:-boda2026}
     depends_on:
       - backend
 
