@@ -3,7 +3,7 @@ import type { Guest } from '@/types'
 
 const QR_SIZE = 400
 const QR_MARGIN = 20
-const QR_COLOR = '#B8860B' // Dorado oscuro
+const QR_COLOR = '#5d4406' // Dorado oscuro
 const LOGO_PATH = '/imgs/kj-transparent.png'
 
 const createQr = (data: string, size: number = QR_SIZE) => {
