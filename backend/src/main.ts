@@ -6,13 +6,18 @@ import { join } from 'path';
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AppModule);
 
+  const envOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+    : [];
+
   const allowedOrigins = [
     'http://localhost:5173',
     'http://127.0.0.1:5173',
     'http://localhost:3000',
     'http://127.0.0.1:3000',
     'http://192.168.100.175:3000',
-    'http://192.168.100.175:5173'
+    'http://192.168.100.175:5173',
+    ...envOrigins,
   ];
 
   app.enableCors({
