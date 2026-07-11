@@ -6,7 +6,7 @@ const CANVAS_SIZE = 680
 const LOGO_SIZE = 70
 const LOGO_RADIUS = 10
 const QR_RADIUS = 32
-const QR_COLOR = '#B8860B' // Dorado oscuro
+const QR_COLOR = '#5C4B1E' // Dorado muy oscuro para alto contraste
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
   return new Promise((resolve, reject) => {
