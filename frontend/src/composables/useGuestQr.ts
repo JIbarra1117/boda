@@ -55,8 +55,8 @@ export const drawGuestQr = async (
   drawRoundedRect(ctx, padding, padding, QR_SIZE, QR_SIZE, QR_RADIUS)
   ctx.fill()
 
-  // Generar QR en dorado oscuro
-  const inviteUrl = `${baseUrl}?guest=${guest.token}`
+  // Generar QR en dorado oscuro (usar código corto para URL más corta y QR más simple)
+  const inviteUrl = `${baseUrl}?guest=${guest.code || guest.token}`
   const qrDataUrl = await QRCode.toDataURL(inviteUrl, {
     width: QR_SIZE,
     margin: 0,
