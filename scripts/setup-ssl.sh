@@ -22,6 +22,9 @@ else
   exit 1
 fi
 
+echo "Preparando directorio para el desafío de Certbot..."
+sudo mkdir -p /var/www/certbot
+
 echo "Obteniendo certificado SSL para $DOMAIN..."
 sudo certbot certonly --webroot -w /var/www/certbot -d "$DOMAIN" --agree-tos --no-eff-email -m "$EMAIL"
 
