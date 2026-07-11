@@ -27,7 +27,6 @@ export interface Guest {
   fullName: string
   email?: string
   phone?: string
-  maxGuests: number
   token: string
   code?: string
   hasRsvp: boolean
@@ -38,7 +37,6 @@ export interface RsvpPayload {
   guestToken: string
   attendCeremony: boolean
   attendCelebration: boolean
-  numberOfGuests: number
   musicSuggestion?: string
   message?: string
 }

@@ -26,7 +26,6 @@
               <div class="guest-welcome">
                 <span class="welcome-label">Confirmando como</span>
                 <span class="welcome-name">{{ identifiedGuest.fullName }}</span>
-                <span class="welcome-passes">Pases disponibles: {{ identifiedGuest.maxGuests }}</span>
               </div>
 
               <div class="form-group attendance-group">
@@ -53,18 +52,6 @@
               </div>
 
               <div class="form-row">
-                <div class="form-group">
-                  <label for="numberOfGuests">Número de invitados</label>
-                  <input
-                    id="numberOfGuests"
-                    v-model.number="form.numberOfGuests"
-                    type="number"
-                    min="1"
-                    max="10"
-                    required
-                  />
-                </div>
-
                 <div class="form-group">
                   <label for="musicSuggestion">¿Qué música no debe faltar?</label>
                   <input
@@ -125,7 +112,6 @@ const form = reactive<RsvpPayload>({
   guestToken: props.guest?.token || '',
   attendCeremony: false,
   attendCelebration: false,
-  numberOfGuests: 1,
   musicSuggestion: '',
   message: '',
 })
@@ -148,7 +134,6 @@ const submit = async () => {
       guestToken: form.guestToken.trim(),
       attendCeremony: form.attendCeremony,
       attendCelebration: form.attendCelebration,
-      numberOfGuests: form.numberOfGuests,
       musicSuggestion: form.musicSuggestion,
       message: form.message,
     })
@@ -168,7 +153,6 @@ const resetFormValues = () => {
   form.guestToken = props.guest?.token || ''
   form.attendCeremony = false
   form.attendCelebration = false
-  form.numberOfGuests = 1
   form.musicSuggestion = ''
   form.message = ''
 }

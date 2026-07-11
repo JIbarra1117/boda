@@ -9,7 +9,6 @@ export class RsvpService {
     guestToken: string;
     attendCeremony: boolean;
     attendCelebration: boolean;
-    numberOfGuests: number;
     musicSuggestion?: string;
     message?: string;
   }) {
@@ -28,18 +27,11 @@ export class RsvpService {
       throw new BadRequestException('Este invitado ya confirmó asistencia');
     }
 
-    if (data.numberOfGuests > guest.maxGuests) {
-      throw new BadRequestException(
-        `Número máximo de invitados permitido: ${guest.maxGuests}`,
-      );
-    }
-
     const rsvp = await this.prisma.rsvp.create({
       data: {
         guestId: guest.id,
         attendCeremony: data.attendCeremony,
         attendCelebration: data.attendCelebration,
-        numberOfGuests: data.numberOfGuests,
         musicSuggestion: data.musicSuggestion,
         message: data.message,
       },

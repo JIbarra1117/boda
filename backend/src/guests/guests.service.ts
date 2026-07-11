@@ -45,7 +45,6 @@ export class GuestsService {
     fullName: string;
     email?: string;
     phone?: string;
-    maxGuests?: number;
   }) {
     const code = await this.generateUniqueCode();
 
@@ -54,7 +53,6 @@ export class GuestsService {
         fullName: data.fullName,
         email: data.email,
         phone: data.phone,
-        maxGuests: data.maxGuests ?? 1,
         code,
       },
     });
@@ -65,7 +63,6 @@ export class GuestsService {
       fullName: string;
       email?: string;
       phone?: string;
-      maxGuests?: number;
     }>,
   ) {
     const results = [];
@@ -92,7 +89,6 @@ export class GuestsService {
       fullName?: string;
       email?: string;
       phone?: string;
-      maxGuests?: number;
     },
   ) {
     const guest = await this.prisma.guest.findUnique({ where: { id } });
@@ -104,7 +100,6 @@ export class GuestsService {
         fullName: data.fullName,
         email: data.email,
         phone: data.phone,
-        maxGuests: data.maxGuests,
       },
     });
   }

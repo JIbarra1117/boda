@@ -127,7 +127,7 @@ const kpis = computed(() => {
   const total = guests.value.length
   const confirmed = guests.value.filter((g) => g.hasRsvp).length
   const pending = total - confirmed
-  const guestsCount = rsvps.value.reduce((sum, r) => sum + (r.numberOfGuests || 0), 0)
+  const guestsCount = rsvps.value.length
   return { total, confirmed, pending, guestsCount }
 })
 

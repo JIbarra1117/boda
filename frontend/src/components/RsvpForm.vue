@@ -21,11 +21,6 @@
       </div>
 
       <div class="form-group">
-        <label>Número de invitados</label>
-        <input v-model.number="form.numberOfGuests" type="number" min="1" max="10" required />
-      </div>
-
-      <div class="form-group">
         <label>¿Qué música no debe faltar?</label>
         <input v-model="form.musicSuggestion" type="text" placeholder="Artista - Canción" />
       </div>
@@ -53,7 +48,6 @@ const form = reactive({
   guestToken: '',
   attendCeremony: false,
   attendCelebration: false,
-  numberOfGuests: 1,
   musicSuggestion: '',
   message: '',
 })
@@ -72,7 +66,6 @@ const submit = async () => {
       guestToken: form.guestToken.trim(),
       attendCeremony: form.attendCeremony,
       attendCelebration: form.attendCelebration,
-      numberOfGuests: form.numberOfGuests,
       musicSuggestion: form.musicSuggestion,
       message: form.message,
     })
@@ -80,7 +73,6 @@ const submit = async () => {
     form.guestToken = ''
     form.attendCeremony = false
     form.attendCelebration = false
-    form.numberOfGuests = 1
     form.musicSuggestion = ''
     form.message = ''
   } catch (e: any) {

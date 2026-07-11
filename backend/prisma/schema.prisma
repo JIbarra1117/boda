@@ -30,7 +30,6 @@ model Guest {
   fullName  String   @map("full_name")
   email     String?
   phone     String?
-  maxGuests Int      @default(1) @map("max_guests")
   token     String   @unique @default(uuid())
   code      String?  @unique
   hasRsvp   Boolean  @default(false) @map("has_rsvp")
@@ -46,7 +45,6 @@ model Rsvp {
   guest             Guest    @relation(fields: [guestId], references: [id])
   attendCeremony    Boolean  @map("attend_ceremony")
   attendCelebration Boolean  @map("attend_celebration")
-  numberOfGuests    Int      @default(1) @map("number_of_guests")
   musicSuggestion   String?  @map("music_suggestion")
   message           String?
   createdAt         DateTime @default(now()) @map("created_at")

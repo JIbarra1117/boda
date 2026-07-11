@@ -12,7 +12,6 @@
             <th>Invitado</th>
             <th>Ceremonia</th>
             <th>Celebración</th>
-            <th>Invitados</th>
             <th>Música sugerida</th>
             <th>Mensaje</th>
             <th>Fecha</th>
@@ -33,7 +32,6 @@
                 {{ r.attendCelebration ? 'Sí' : 'No' }}
               </span>
             </td>
-            <td>{{ r.numberOfGuests }}</td>
             <td>{{ r.musicSuggestion || '—' }}</td>
             <td>
               <span class="message-cell" :title="r.message || ''">
@@ -43,7 +41,7 @@
             <td>{{ formatDate(r.createdAt) }}</td>
           </tr>
           <tr v-if="rsvps.length === 0">
-            <td colspan="7" class="empty">Aún no hay confirmaciones</td>
+            <td colspan="6" class="empty">Aún no hay confirmaciones</td>
           </tr>
         </tbody>
       </table>

@@ -22,7 +22,6 @@ export class GuestsController {
       fullName: string;
       email?: string;
       phone?: string;
-      maxGuests?: number;
     },
   ) {
     return this.guestsService.create(body);
@@ -36,7 +35,6 @@ export class GuestsController {
         fullName: string;
         email?: string;
         phone?: string;
-        maxGuests?: number;
       }>;
     },
   ) {
@@ -51,7 +49,6 @@ export class GuestsController {
       fullName?: string;
       email?: string;
       phone?: string;
-      maxGuests?: number;
     },
   ) {
     return this.guestsService.update(Number(id), body);

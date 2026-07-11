@@ -19,19 +19,6 @@
         </div>
 
         <div class="form-group">
-          <label for="maxGuests">Máximo de pases</label>
-          <input
-            id="maxGuests"
-            v-model.number="form.maxGuests"
-            type="number"
-            min="1"
-            max="20"
-            required
-          />
-        </div>
-      </div>
-
-      <div class="form-row">
         <div class="form-group">
           <label for="email">Correo electrónico</label>
           <input
@@ -76,7 +63,7 @@
       <h3>Carga masiva desde Excel</h3>
       <p class="hint">
         Subí un archivo Excel (.xlsx) con las columnas:
-        <code>fullName</code>, <code>email</code>, <code>phone</code>, <code>maxGuests</code>.
+        <code>fullName</code>, <code>email</code>, <code>phone</code>.
         La primera fila debe ser el encabezado.
       </p>
 
@@ -98,7 +85,6 @@
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Teléfono</th>
-                <th>Pases</th>
               </tr>
             </thead>
             <tbody>
@@ -106,7 +92,6 @@
                 <td>{{ row.fullName }}</td>
                 <td>{{ row.email || '—' }}</td>
                 <td>{{ row.phone || '—' }}</td>
-                <td>{{ row.maxGuests }}</td>
               </tr>
             </tbody>
           </table>
@@ -140,7 +125,6 @@
         <thead>
           <tr>
             <th>Invitado</th>
-            <th>Pases</th>
             <th>Estado</th>
             <th>Código</th>
             <th>Corto</th>
@@ -155,7 +139,6 @@
                 {{ guest.email }}<span v-if="guest.email && guest.phone"> · </span>{{ guest.phone }}
               </div>
             </td>
-            <td>{{ guest.maxGuests }}</td>
             <td>
               <span class="badge" :class="guest.hasRsvp ? 'yes' : 'pending'">
                 {{ guest.hasRsvp ? 'Confirmado' : 'Pendiente' }}
@@ -194,7 +177,7 @@
             </td>
           </tr>
           <tr v-if="guests.length === 0">
-            <td colspan="6" class="empty">Aún no hay invitados registrados</td>
+            <td colspan="5" class="empty">Aún no hay invitados registrados</td>
           </tr>
         </tbody>
       </table>
@@ -242,7 +225,7 @@ const downloadingAll = ref(false)
 const baseUrl = getBaseUrl()
 
 const excelInput = ref<HTMLInputElement | null>(null)
-const excelPreview = ref<{ fullName: string; email: string; phone: string; maxGuests: number }[]>([])
+const excelPreview = ref<{ fullName: string; email: string; phone: string }[]>([])
 const bulkLoading = ref(false)
 const bulkSuccess = ref('')
 const bulkErrors = ref<{ row: number; fullName: string; error: string }[]>([])
@@ -251,7 +234,6 @@ const form = reactive({
   fullName: '',
   email: '',
   phone: '',
-  maxGuests: 1,
 })
 
 const loadGuests = async () => {
@@ -273,7 +255,6 @@ const handleSubmit = async () => {
         fullName: form.fullName,
         email: form.email || undefined,
         phone: form.phone || undefined,
-        maxGuests: form.maxGuests,
       })
       success.value = 'Invitado actualizado correctamente'
     } else {
@@ -281,7 +262,6 @@ const handleSubmit = async () => {
         fullName: form.fullName,
         email: form.email || undefined,
         phone: form.phone || undefined,
-        maxGuests: form.maxGuests,
       })
       success.value = 'Invitado agregado correctamente'
     }
@@ -299,7 +279,6 @@ const editGuest = (guest: Guest) => {
   form.fullName = guest.fullName
   form.email = guest.email || ''
   form.phone = guest.phone || ''
-  form.maxGuests = guest.maxGuests
 }
 
 const deleteGuest = async (id: number) => {
@@ -319,7 +298,6 @@ const resetForm = () => {
   form.fullName = ''
   form.email = ''
   form.phone = ''
-  form.maxGuests = 1
   success.value = ''
   error.value = ''
 }
@@ -354,28 +332,22 @@ const handleExcelUpload = (event: Event) => {
       const nameIndex = headers.indexOf('fullname')
       const emailIndex = headers.indexOf('email')
       const phoneIndex = headers.indexOf('phone')
-      const maxGuestsIndex = headers.indexOf('maxguests')
-
-      if (nameIndex === -1 || maxGuestsIndex === -1) {
-        error.value = 'El archivo debe tener las columnas fullName y maxGuests'
+      if (nameIndex === -1) {
+        error.value = 'El archivo debe tener la columna fullName'
         return
       }
 
-      const parsed: { fullName: string; email: string; phone: string; maxGuests: number }[] = []
+      const parsed: { fullName: string; email: string; phone: string }[] = []
 
       for (let i = 1; i < json.length; i++) {
         const row = json[i]
         const fullName = String(row[nameIndex] || '').trim()
         if (!fullName) continue
 
-        const rawMax = row[maxGuestsIndex]
-        const maxGuests = typeof rawMax === 'number' ? rawMax : parseInt(String(rawMax), 10)
-
         parsed.push({
           fullName,
           email: emailIndex >= 0 ? String(row[emailIndex] || '').trim() : '',
           phone: phoneIndex >= 0 ? String(row[phoneIndex] || '').trim() : '',
-          maxGuests: isNaN(maxGuests) || maxGuests < 1 ? 1 : maxGuests,
         })
       }
 
