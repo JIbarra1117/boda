@@ -3,8 +3,8 @@ import type { Guest } from '@/types'
 
 const QR_SIZE = 400
 const CANVAS_SIZE = 480
-const LOGO_SIZE = 90
-const LOGO_RADIUS = 12
+const LOGO_SIZE = 130
+const LOGO_RADIUS = 16
 const QR_RADIUS = 24
 
 const loadImage = (src: string): Promise<HTMLImageElement> => {
