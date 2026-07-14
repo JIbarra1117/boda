@@ -45,7 +45,6 @@ const navItems = [
   { id: 'couple', label: 'Nosotros' },
   { id: 'details', label: 'Evento' },
   { id: 'countdown', label: 'Cuenta Regresiva' },
-  { id: 'gallery', label: 'Galería' },
   { id: 'rsvp', label: 'Confirmar' },
   { id: 'gifts', label: 'Regalos' },
 ]
@@ -101,6 +100,8 @@ onUnmounted(() => {
 }
 
 .header-logo {
+  position: relative;
+  z-index: 10;
   font-family: var(--font-script);
   font-size: var(--text-2xl);
   color: var(--text-primary);
@@ -149,13 +150,14 @@ onUnmounted(() => {
 }
 
 .menu-toggle {
+  position: relative;
+  z-index: 10;
   display: none;
   flex-direction: column;
   gap: 5px;
   background: none;
   border: none;
   padding: var(--space-2);
-  z-index: 1001;
 }
 
 .menu-toggle span {
@@ -179,14 +181,18 @@ onUnmounted(() => {
 }
 
 @media (max-width: 768px) {
+  .app-header.is-expanded {
+    height: 100dvh;
+    background: rgba(250, 248, 245, 0.98);
+  }
+
   .header-nav {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(250, 248, 245, 0.98);
-    backdrop-filter: blur(16px);
+    background: transparent;
     flex-direction: column;
     justify-content: center;
     gap: var(--space-6);
@@ -194,6 +200,7 @@ onUnmounted(() => {
     pointer-events: none;
     transform: translateY(-10px);
     transition: all var(--transition-base);
+    z-index: 5;
   }
 
   .header-nav.is-open {
