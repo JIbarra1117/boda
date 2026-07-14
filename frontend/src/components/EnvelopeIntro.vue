@@ -60,8 +60,8 @@
         <div class="guest-tag">
           <div class="tag-hole" aria-hidden="true"></div>
           <div class="tag-content">
-            <span class="tag-pretitle">Invitación para</span>
-            <span class="tag-name">{{ guest.fullName }}</span>
+            <span class="tag-pretitle">Invitación Para</span>
+            <span class="tag-name">{{ guest ? toTitleCase(guest.fullName) : '' }}</span>
           </div>
           <div class="tag-shadow" aria-hidden="true"></div>
         </div>
@@ -94,6 +94,19 @@ const props = defineProps<{
 const emit = defineEmits<{
   open: []
 }>()
+
+const toTitleCase = (str?: string) => {
+  if (!str) return '';
+  const lowercaseWords = ['y', 'e', 'o', 'u', 'de', 'del', 'la', 'las', 'el', 'los', 'en', 'con', 'a', 'para'];
+  return str.split(/\s+/).map((word, index) => {
+    if (word === '&') return word;
+    const lowerWord = word.toLowerCase();
+    if (index > 0 && lowercaseWords.includes(lowerWord)) {
+      return lowerWord;
+    }
+    return lowerWord.charAt(0).toUpperCase() + lowerWord.slice(1);
+  }).join(' ');
+}
 
 const handleClick = () => {
   if (!props.isLoading && !props.isOpening) {
@@ -469,7 +482,6 @@ const handleClick = () => {
 .tag-pretitle {
   font-family: var(--font-body);
   font-size: 0.6rem;
-  text-transform: uppercase;
   letter-spacing: 0.25em;
   color: var(--color-sage-light);
 }
