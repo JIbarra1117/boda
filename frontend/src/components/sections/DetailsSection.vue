@@ -71,7 +71,7 @@
         </div>
       </div>
 
-      <div class="calendar-action-wrapper" v-if="settings?.calendarUrl" ref="elementRef3" :class="{ 'is-visible': isVisible3 }">
+      <div class="calendar-action-wrapper" v-show="settings?.calendarUrl" ref="elementRef3" :class="{ 'is-visible': isVisible3 }">
         <a :href="settings.calendarUrl" target="_blank" rel="noopener" class="calendar-button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
