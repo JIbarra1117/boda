@@ -31,36 +31,38 @@
               <div class="form-group attendance-group">
                 <label>¿A qué eventos asistirás?</label>
                 <div class="checkbox-group">
-                  <label class="checkbox-card" :class="{ checked: form.attendCeremony }">
-                    <input type="checkbox" v-model="form.attendCeremony" />
-                    <span class="check-icon"></span>
-                    <span class="checkbox-text">
+                  <label class="switch-card" :class="{ checked: form.attendCeremony }">
+                    <div class="switch-text">
                       <strong>Ceremonia</strong>
                       <small>Donde diremos "sí, acepto"</small>
-                    </span>
+                    </div>
+                    <div class="switch-toggle">
+                      <input type="checkbox" v-model="form.attendCeremony" />
+                      <span class="slider"></span>
+                    </div>
                   </label>
 
-                  <label class="checkbox-card" :class="{ checked: form.attendCelebration }">
-                    <input type="checkbox" v-model="form.attendCelebration" />
-                    <span class="check-icon"></span>
-                    <span class="checkbox-text">
+                  <label class="switch-card" :class="{ checked: form.attendCelebration }">
+                    <div class="switch-text">
                       <strong>Celebración</strong>
                       <small>Para bailar y festejar juntos</small>
-                    </span>
+                    </div>
+                    <div class="switch-toggle">
+                      <input type="checkbox" v-model="form.attendCelebration" />
+                      <span class="slider"></span>
+                    </div>
                   </label>
                 </div>
               </div>
 
-              <div class="form-row">
-                <div class="form-group">
-                  <label for="musicSuggestion">¿Qué música no debe faltar?</label>
-                  <input
-                    id="musicSuggestion"
-                    v-model="form.musicSuggestion"
-                    type="text"
-                    placeholder="Artista - Canción"
-                  />
-                </div>
+              <div class="form-group">
+                <label for="musicSuggestion">¿Qué música no debe faltar?</label>
+                <input
+                  id="musicSuggestion"
+                  v-model="form.musicSuggestion"
+                  type="text"
+                  placeholder="Artista - Canción"
+                />
               </div>
 
               <div class="form-group">
@@ -314,82 +316,102 @@ const resetForAnotherGuest = () => {
 
 .form-row {
   display: grid;
-  grid-template-columns: 1fr 2fr;
+  grid-template-columns: 1fr;
   gap: var(--space-4);
 }
 
 .checkbox-group {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: var(--space-3);
+  gap: var(--space-4);
 }
 
-.checkbox-card {
+.switch-card {
   display: flex;
-  align-items: flex-start;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-5);
   border: 1px solid var(--color-sand);
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-lg);
   background: var(--bg-primary);
   cursor: pointer;
   transition: all var(--transition-fast);
+  box-shadow: var(--shadow-sm);
 }
 
-.checkbox-card:hover {
+.switch-card:hover {
   border-color: var(--color-lavender-soft);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
 }
 
-.checkbox-card.checked {
+.switch-card.checked {
   border-color: var(--text-accent);
-  background: rgba(160, 177, 227, 0.08);
+  background: rgba(160, 177, 227, 0.05);
 }
 
-.checkbox-card input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.check-icon {
-  width: 22px;
-  height: 22px;
-  min-width: 22px;
-  border: 2px solid var(--color-lavender-soft);
-  border-radius: var(--radius-sm);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all var(--transition-fast);
-}
-
-.checkbox-card.checked .check-icon {
-  background: var(--text-accent);
-  border-color: var(--text-accent);
-}
-
-.checkbox-card.checked .check-icon::after {
-  content: '✓';
-  color: var(--color-white);
-  font-size: 14px;
-}
-
-.checkbox-text {
+.switch-text {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
-.checkbox-text strong {
+.switch-text strong {
   font-family: var(--font-body);
   font-size: var(--text-sm);
   color: var(--text-primary);
   font-weight: 700;
 }
 
-.checkbox-text small {
-  font-size: var(--text-xs);
+.switch-text small {
+  font-size: 0.7rem;
   color: var(--text-muted);
+}
+
+.switch-toggle {
+  position: relative;
+  width: 44px;
+  height: 24px;
+  flex-shrink: 0;
+}
+
+.switch-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-sand);
+  transition: .3s ease;
+  border-radius: 24px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 18px;
+  width: 18px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .3s ease;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input:checked + .slider {
+  background-color: var(--text-accent);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }
 
 .btn-primary {

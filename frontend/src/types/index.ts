@@ -7,6 +7,8 @@ export interface WeddingSettings {
   bankName?: string
   bankAccountName?: string
   bankAccountNumber?: string
+  bankAccountId?: string
+  bankAccountEmail?: string
   polaroidBrideImage?: string
   polaroidGroomImage?: string
   backgroundMusic?: string
@@ -20,6 +22,7 @@ export interface WeddingSettings {
   celebrationMapsUrl?: string
   dressCode?: string
   loveQuote?: string
+  calendarUrl?: string
 }
 
 export interface Guest {

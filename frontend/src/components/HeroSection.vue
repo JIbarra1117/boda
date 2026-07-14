@@ -3,6 +3,13 @@
     <div class="hero-background">
       <div class="hero-gradient"></div>
       <div class="hero-pattern"></div>
+      
+      <!-- Burbujas con imágenes -->
+      <div class="bubbles-container">
+        <div v-for="(style, index) in bubbleStyles" :key="index" class="bubble" :style="style">
+          <img :src="`/imgs/gallery/${index + 1}.jpg`" alt="" />
+        </div>
+      </div>
     </div>
 
     <div class="hero-content">
@@ -56,6 +63,43 @@ const weddingMonth = computed(() =>
   weddingDate.value?.toLocaleDateString('es-ES', { month: 'long' })
 )
 const weddingYear = computed(() => weddingDate.value?.getFullYear())
+
+// Estilos precalculados para las burbujas para que no cambien en re-renders
+const bubbleStyles = Array.from({ length: 12 }, (_, i) => {
+  const size = 70 + Math.random() * 50; // Entre 70px y 120px
+  
+  // Alternar entre lado izquierdo y derecho (i par = izq, i impar = der)
+  const isLeft = i % 2 === 0;
+  
+  // Posición desde el borde (2% a 12%)
+  // Usaremos 'left' para las izquierdas y 'right' para las derechas
+  // Esto evita que se corten en pantallas pequeñas
+  const edgePos = 2 + Math.random() * 10;
+    
+  // Velocidad constante para todas las burbujas para evitar que se alcancen y choquen
+  const animationDuration = 45; // 45 segundos en subir
+  
+  // Para que salgan de 1 en 1 sin chocar:
+  // Hay 6 burbujas por lado. Las espaciamos equitativamente en los 45 segundos.
+  const bubblesPerSide = 6;
+  const sideIndex = Math.floor(i / 2); // Índice de 0 a 5 por cada lado
+  const delaySpacing = animationDuration / bubblesPerSide; // 7.5 segundos entre cada burbuja
+  
+  // Usamos delay negativo para que ya haya burbujas en pantalla al cargar
+  const animationDelay = -(sideIndex * delaySpacing);
+  
+  // Pequeña variación horizontal al subir (drift)
+  const drift = -10 + Math.random() * 20; // -10px a 10px
+
+  return {
+    width: `${size}px`,
+    height: `${size}px`,
+    [isLeft ? 'left' : 'right']: `${edgePos}%`,
+    '--drift': `${drift}px`, // Usaremos esta variable en CSS para el movimiento lateral
+    animationDuration: `${animationDuration}s`,
+    animationDelay: `${animationDelay}s`
+  };
+})
 </script>
 
 <style scoped>
@@ -94,6 +138,52 @@ const weddingYear = computed(() => weddingDate.value?.getFullYear())
     radial-gradient(circle at 25% 25%, var(--color-lavender) 1px, transparent 1px),
     radial-gradient(circle at 75% 75%, var(--color-lavender) 1px, transparent 1px);
   background-size: 60px 60px;
+}
+
+.bubbles-container {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: 1; /* Detrás del contenido principal */
+  pointer-events: none; /* Para no interferir con los clics */
+}
+
+.bubble {
+  position: absolute;
+  bottom: 0;
+  border-radius: 50%;
+  overflow: hidden;
+  opacity: 0.75;
+  box-shadow: 0 8px 32px rgba(194, 184, 227, 0.4);
+  animation: float-up infinite linear;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+  pointer-events: auto; /* Para que tengan hover si es necesario */
+  will-change: transform; /* Aceleración por hardware (GPU) para evitar tirones */
+}
+
+.bubble:hover {
+  opacity: 1;
+  transform: scale(1.1);
+  z-index: 10;
+}
+
+.bubble img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+@keyframes float-up {
+  0% {
+    transform: translateY(150px) translateX(0);
+  }
+  50% {
+    transform: translateY(-100vh) translateX(var(--drift));
+  }
+  100% {
+    transform: translateY(-200vh) translateX(0); /* -200vh garantiza que siempre superará el tope superior sin importar el tamaño del contenedor */
+  }
 }
 
 .hero-content {
@@ -264,6 +354,14 @@ const weddingYear = computed(() => weddingDate.value?.getFullYear())
     flex-direction: column;
     align-items: center;
     gap: var(--space-1);
+  }
+  
+  /* Mejoras para las burbujas en móvil */
+  .bubble {
+    /* Las hacemos más pequeñas usando la propiedad scale (independiente de transform) */
+    scale: 0.6;
+    /* Opacidad mayor para que sean visibles */
+    opacity: 0.6 !important;
   }
 }
 </style>

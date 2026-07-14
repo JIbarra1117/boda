@@ -39,6 +39,51 @@
         <input v-model="form.bankAccountNumber" type="text" />
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label>Cédula</label>
+          <input v-model="form.bankAccountId" type="text" />
+        </div>
+        <div class="form-group">
+          <label>Correo electrónico</label>
+          <input v-model="form.bankAccountEmail" type="email" />
+        </div>
+      </div>
+
+      <div class="events-divider"><h3>Ceremonia</h3></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hora de la ceremonia</label>
+          <input v-model="form.ceremonyTime" type="time" />
+        </div>
+        <div class="form-group">
+          <label>Lugar del Evento</label>
+          <input v-model="form.ceremonyLocation" type="text" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Dirección del Evento</label>
+        <input v-model="form.ceremonyAddress" type="text" />
+      </div>
+      <div class="form-group">
+        <label>Google Maps URL (Evento)</label>
+        <input v-model="form.ceremonyMapsUrl" type="url" />
+      </div>
+
+      <div class="events-divider"><h3>Celebración</h3></div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Hora de la celebración</label>
+          <input v-model="form.celebrationTime" type="time" />
+        </div>
+      </div>
+
+      <div class="events-divider"><h3>Recordatorio</h3></div>
+      <div class="form-group">
+        <label>Google Calendar URL (Recordatorio)</label>
+        <input v-model="form.calendarUrl" type="url" />
+      </div>
+
       <button type="submit" :disabled="loading">
         {{ loading ? 'Guardando...' : 'Guardar cambios' }}
       </button>
@@ -62,6 +107,17 @@ const form = reactive({
   bankName: '',
   bankAccountName: '',
   bankAccountNumber: '',
+  bankAccountId: '',
+  bankAccountEmail: '',
+  ceremonyTime: '',
+  ceremonyLocation: '',
+  ceremonyAddress: '',
+  ceremonyMapsUrl: '',
+  celebrationTime: '',
+  celebrationLocation: '',
+  celebrationAddress: '',
+  celebrationMapsUrl: '',
+  calendarUrl: '',
 })
 
 const loading = ref(false)
@@ -87,6 +143,17 @@ onMounted(async () => {
     form.bankName = s.bankName || ''
     form.bankAccountName = s.bankAccountName || ''
     form.bankAccountNumber = s.bankAccountNumber || ''
+    form.bankAccountId = s.bankAccountId || ''
+    form.bankAccountEmail = s.bankAccountEmail || ''
+    form.ceremonyTime = s.ceremonyTime || ''
+    form.ceremonyLocation = s.ceremonyLocation || ''
+    form.ceremonyAddress = s.ceremonyAddress || ''
+    form.ceremonyMapsUrl = s.ceremonyMapsUrl || ''
+    form.celebrationTime = s.celebrationTime || ''
+    form.celebrationLocation = s.celebrationLocation || ''
+    form.celebrationAddress = s.celebrationAddress || ''
+    form.celebrationMapsUrl = s.celebrationMapsUrl || ''
+    form.calendarUrl = s.calendarUrl || ''
   } catch (e) {
     console.error(e)
   }
@@ -106,6 +173,17 @@ const save = async () => {
       bankName: form.bankName,
       bankAccountName: form.bankAccountName,
       bankAccountNumber: form.bankAccountNumber,
+      bankAccountId: form.bankAccountId,
+      bankAccountEmail: form.bankAccountEmail,
+      ceremonyTime: form.ceremonyTime,
+      ceremonyLocation: form.ceremonyLocation,
+      ceremonyAddress: form.ceremonyAddress,
+      ceremonyMapsUrl: form.ceremonyMapsUrl,
+      celebrationTime: form.celebrationTime,
+      celebrationLocation: form.celebrationLocation,
+      celebrationAddress: form.celebrationAddress,
+      celebrationMapsUrl: form.celebrationMapsUrl,
+      calendarUrl: form.calendarUrl,
     })
     success.value = true
   } catch (e: any) {
@@ -141,6 +219,19 @@ h2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1rem;
+}
+
+.events-divider {
+  margin-top: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--color-lavender-soft);
+}
+
+.events-divider h3 {
+  font-family: var(--font-display);
+  color: var(--color-sage);
+  font-size: 1.1rem;
+  margin: 0;
 }
 
 .form-group {

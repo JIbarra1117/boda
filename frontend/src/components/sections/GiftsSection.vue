@@ -37,6 +37,20 @@
             </div>
           </div>
 
+          <div v-if="settings.bankAccountId" class="bank-row">
+            <div class="bank-info">
+              <span class="bank-label">Cédula / ID</span>
+              <span class="bank-value">{{ settings.bankAccountId }}</span>
+            </div>
+          </div>
+
+          <div v-if="settings.bankAccountEmail" class="bank-row">
+            <div class="bank-info">
+              <span class="bank-label">Correo</span>
+              <span class="bank-value">{{ settings.bankAccountEmail }}</span>
+            </div>
+          </div>
+
           <div class="bank-row">
             <div class="bank-info">
               <span class="bank-label">Cuenta</span>
@@ -129,13 +143,15 @@ const copyAccount = async () => {
 .gifts-card {
   background: var(--color-white);
   border: 1px solid var(--color-lavender-soft);
-  border-radius: var(--radius-xl);
-  padding: var(--space-12) var(--space-10);
+  border-radius: 20px;
+  padding: var(--space-12) var(--space-8);
   text-align: center;
-  box-shadow: var(--shadow-lg);
+  box-shadow: 0 4px 20px rgba(194, 184, 227, 0.15);
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 .gifts-card.is-visible {
@@ -144,10 +160,10 @@ const copyAccount = async () => {
 }
 
 .gift-icon {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   margin: 0 auto var(--space-6);
-  color: var(--text-accent);
+  color: #A0B1E3; /* Soft lavender/blue */
 }
 
 .gift-icon svg {
@@ -157,18 +173,19 @@ const copyAccount = async () => {
 
 .gifts-message {
   font-family: var(--font-serif);
-  font-size: var(--text-xl);
+  font-size: 1.1rem;
   font-style: italic;
-  color: var(--text-secondary);
-  line-height: 1.7;
+  color: #80849E;
+  line-height: 1.8;
   margin-bottom: var(--space-8);
+  padding: 0 var(--space-4);
 }
 
 .bank-card {
-  background: var(--bg-primary);
-  border: 1px solid var(--color-sand);
+  background: #F9F8F6;
+  border: 1px solid rgba(232, 213, 196, 0.4);
   border-radius: var(--radius-lg);
-  padding: var(--space-6);
+  padding: var(--space-8) var(--space-6);
   text-align: left;
 }
 
@@ -191,12 +208,13 @@ const copyAccount = async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--space-3) 0;
-  border-bottom: 1px solid var(--color-sand);
+  padding: var(--space-4) 0;
+  border-bottom: 1px solid rgba(232, 213, 196, 0.5);
 }
 
 .bank-row:last-child {
   border-bottom: none;
+  padding-bottom: 0;
 }
 
 .bank-info {
@@ -227,21 +245,24 @@ const copyAccount = async () => {
 }
 
 .copy-btn {
-  padding: var(--space-2) var(--space-4);
-  background: var(--text-primary);
-  color: var(--color-white);
+  padding: var(--space-3) var(--space-6);
+  background: #2b1c43;
+  color: white;
   border: none;
-  border-radius: var(--radius-full);
+  border-radius: 99px;
   font-family: var(--font-body);
-  font-size: var(--text-xs);
+  font-size: 0.75rem;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.1em;
+  font-weight: 600;
   transition: all var(--transition-fast);
+  cursor: pointer;
 }
 
 .copy-btn:hover {
-  background: var(--color-sage-dark);
-  transform: translateY(-1px);
+  background: #1a1025;
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-sm);
 }
 
 .coming-soon {

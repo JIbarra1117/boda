@@ -34,11 +34,23 @@ export class SettingsService {
     if (data.bankAccountNumber !== undefined) updateData.bankAccountNumber = data.bankAccountNumber;
     if (data.bankAccountName !== undefined) updateData.bankAccountName = data.bankAccountName;
     if (data.bankName !== undefined) updateData.bankName = data.bankName;
+    if (data.bankAccountId !== undefined) updateData.bankAccountId = data.bankAccountId;
+    if (data.bankAccountEmail !== undefined) updateData.bankAccountEmail = data.bankAccountEmail;
     if (data.brideName !== undefined) updateData.brideName = data.brideName;
     if (data.groomName !== undefined) updateData.groomName = data.groomName;
     if (data.polaroidBrideImage !== undefined) updateData.polaroidBrideImage = data.polaroidBrideImage;
     if (data.polaroidGroomImage !== undefined) updateData.polaroidGroomImage = data.polaroidGroomImage;
     if (data.backgroundMusic !== undefined) updateData.backgroundMusic = data.backgroundMusic;
+
+    if (data.ceremonyTime !== undefined) updateData.ceremonyTime = data.ceremonyTime;
+    if (data.ceremonyLocation !== undefined) updateData.ceremonyLocation = data.ceremonyLocation;
+    if (data.ceremonyAddress !== undefined) updateData.ceremonyAddress = data.ceremonyAddress;
+    if (data.ceremonyMapsUrl !== undefined) updateData.ceremonyMapsUrl = data.ceremonyMapsUrl;
+    if (data.celebrationTime !== undefined) updateData.celebrationTime = data.celebrationTime;
+    if (data.celebrationLocation !== undefined) updateData.celebrationLocation = data.celebrationLocation;
+    if (data.celebrationAddress !== undefined) updateData.celebrationAddress = data.celebrationAddress;
+    if (data.celebrationMapsUrl !== undefined) updateData.celebrationMapsUrl = data.celebrationMapsUrl;
+    if (data.calendarUrl !== undefined) updateData.calendarUrl = data.calendarUrl;
 
     return this.prisma.settings.update({
       where: { id: settings.id },

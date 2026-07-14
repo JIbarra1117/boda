@@ -25,6 +25,7 @@
       <CoupleSection :settings="settings" />
       <StorySection />
       <DetailsSection :settings="settings" />
+      <DressCodeSection />
       <CountdownSection :settings="settings" />
       <VerseSection />
       <RsvpSection :guest="guest" @guest-identified="guest = $event" />
@@ -54,6 +55,7 @@ import EnvelopeIntro from '@/components/EnvelopeIntro.vue'
 import HeroSection from '@/components/HeroSection.vue'
 import CoupleSection from '@/components/sections/CoupleSection.vue'
 import DetailsSection from '@/components/sections/DetailsSection.vue'
+import DressCodeSection from '@/components/sections/DressCodeSection.vue'
 import CountdownSection from '@/components/sections/CountdownSection.vue'
 import RsvpSection from '@/components/sections/RsvpSection.vue'
 import GiftsSection from '@/components/sections/GiftsSection.vue'

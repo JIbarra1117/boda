@@ -1,33 +1,33 @@
 <template>
   <section id="dress-code" class="dress-code-section">
-    <div class="dress-code-content" ref="elementRef" :class="{ 'is-visible': isVisible }">
-      <div class="section-header">
-        <span class="section-label">Código de Vestimenta</span>
-        <h2 class="section-title">Dress Code</h2>
+    <div class="dress-code-content">
+      <div class="section-header" ref="elementRef" :class="{ 'is-visible': isVisible }">
+        <span class="section-label">Dress Code</span>
+        <h2 class="section-title">Código de Vestimenta</h2>
       </div>
 
-      <div class="dress-code-card">
-        <div class="dress-icon">
+      <div class="dress-code-card" ref="elementRef2" :class="{ 'is-visible': isVisible2 }">
+        <div class="icon-container">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-            <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+            <path d="M12 2l3 6 4-2-2 5 2 5-4-2-3 6-3-6-4 2 2-5-2-5 4 2z" stroke-linejoin="round" stroke-linecap="round"/>
           </svg>
         </div>
-
-        <h3 class="dress-code-name">{{ settings?.dressCode || 'Formal Elegante' }}</h3>
-
-        <p class="dress-code-hint">
-          Queremos que te sientas cómodo y especial. Evita el color blanco y tonos muy claros para resaltar a la novia.
+        
+        <h3 class="dress-level">Formal</h3>
+        <p class="dress-description">
+          Nos encantaría que nos acompañes luciendo espectacular en nuestro gran día.
         </p>
 
-        <div class="color-palette">
-          <span class="color-dot" style="background: #2C3E50;" title="Azul marino"></span>
-          <span class="color-dot" style="background: #2b1c43;" title="Púrpura"></span>
-          <span class="color-dot" style="background: #D4A5A5;" title="Rosa viejo"></span>
-          <span class="color-dot" style="background: #C9B99A;" title="Champagne"></span>
-          <span class="color-dot" style="background: #80849E;" title="Lavanda"></span>
+        <div class="colors-section">
+          <h4 class="colors-title">Tonalidades sugeridas</h4>
+          <div class="color-palette">
+            <div class="color-circle" style="background-color: #6E7B60;" title="Verde Oliva"></div>
+            <div class="color-circle" style="background-color: #B9B5D8;" title="Lila"></div>
+            <div class="color-circle" style="background-color: #A0B2DF;" title="Azul Claro"></div>
+            <div class="color-circle" style="background-color: #E8E2D5;" title="Crema"></div>
+            <div class="color-circle" style="background-color: #38245D;" title="Morado Oscuro"></div>
+          </div>
         </div>
-
-        <p class="palette-label">Paleta sugerida</p>
       </div>
     </div>
   </section>
@@ -35,38 +35,33 @@
 
 <script setup lang="ts">
 import { useScrollReveal } from '@/composables/useScrollReveal'
-import type { WeddingSettings } from '@/types'
-
-defineProps<{
-  settings: WeddingSettings | null
-}>()
 
 const { elementRef, isVisible } = useScrollReveal()
+const { elementRef: elementRef2, isVisible: isVisible2 } = useScrollReveal()
 </script>
 
 <style scoped>
 .dress-code-section {
   padding: var(--space-24) var(--space-6);
-  background:
-    linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+  background: var(--bg-secondary);
 }
 
 .dress-code-content {
   max-width: var(--max-width-content);
   margin: 0 auto;
-  opacity: 0;
-  transform: translateY(30px);
-  transition: opacity 0.8s ease, transform 0.8s ease;
-}
-
-.dress-code-content.is-visible {
-  opacity: 1;
-  transform: translateY(0);
 }
 
 .section-header {
   text-align: center;
   margin-bottom: var(--space-10);
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.section-header.is-visible {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 .section-label {
@@ -89,72 +84,89 @@ const { elementRef, isVisible } = useScrollReveal()
 .dress-code-card {
   background: var(--color-white);
   border: 1px solid var(--color-lavender-soft);
-  border-radius: var(--radius-xl);
+  border-radius: 20px;
   padding: var(--space-12) var(--space-8);
   text-align: center;
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 4px 20px rgba(194, 184, 227, 0.15);
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
 }
 
-.dress-icon {
-  width: 72px;
-  height: 72px;
+.dress-code-card.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.icon-container {
+  width: 64px;
+  height: 64px;
   margin: 0 auto var(--space-6);
-  color: var(--text-accent);
+  color: #A0B1E3;
 }
 
-.dress-icon svg {
+.icon-container svg {
   width: 100%;
   height: 100%;
 }
 
-.dress-code-name {
+.dress-level {
   font-family: var(--font-display);
-  font-size: var(--text-3xl);
+  font-size: var(--text-2xl);
   color: var(--text-primary);
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-2);
 }
 
-.dress-code-hint {
+.dress-description {
   font-family: var(--font-serif);
-  font-size: var(--text-lg);
+  font-size: 1.1rem;
   font-style: italic;
-  color: var(--text-secondary);
-  line-height: 1.6;
+  color: #80849E;
   margin-bottom: var(--space-8);
+}
+
+.colors-section {
+  padding-top: var(--space-6);
+  border-top: 1px solid rgba(232, 213, 196, 0.5);
+}
+
+.colors-title {
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  margin-bottom: var(--space-6);
+  font-weight: 600;
 }
 
 .color-palette {
   display: flex;
   justify-content: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-4);
+  gap: var(--space-4);
+  flex-wrap: wrap;
 }
 
-.color-dot {
-  width: 32px;
-  height: 32px;
-  border-radius: var(--radius-full);
-  border: 2px solid var(--color-white);
-  box-shadow: var(--shadow-sm);
-  transition: transform var(--transition-fast);
+.color-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease;
 }
 
-.color-dot:hover {
-  transform: scale(1.15);
-}
-
-.palette-label {
-  font-family: var(--font-body);
-  font-size: var(--text-xs);
-  text-transform: uppercase;
-  letter-spacing: 0.15em;
-  color: var(--text-muted);
-  margin: 0;
+.color-circle:hover {
+  transform: scale(1.1);
 }
 
 @media (max-width: 640px) {
   .dress-code-card {
     padding: var(--space-8) var(--space-4);
+  }
+  
+  .color-circle {
+    width: 40px;
+    height: 40px;
   }
 }
 </style>

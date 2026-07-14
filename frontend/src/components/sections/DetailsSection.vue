@@ -12,82 +12,75 @@
         <p class="section-subtitle">Te esperamos para celebrar juntos este momento tan especial</p>
       </div>
 
-      <div class="events-grid" ref="elementRef2" :class="{ 'is-visible': isVisible2 }">
-        <div class="event-card ceremony">
-          <div class="event-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-            </svg>
+      <div class="events-unified" ref="elementRef2" :class="{ 'is-visible': isVisible2 }">
+        <div class="event-card unified-card">
+          <div class="event-icons-row">
+            <div class="event-icon">
+              <!-- Ceremony Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </div>
+            <span class="divider-icon">♥</span>
+            <div class="event-icon">
+              <!-- Celebration Icon -->
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M12 2a5 5 0 00-5 5v1H5a2 2 0 00-2 2v1a2 2 0 002 2h14a2 2 0 002-2v-1a2 2 0 00-2-2h-2V7a5 5 0 00-5-5z"/>
+                <path d="M7 13v7a2 2 0 002 2h6a2 2 0 002-2v-7"/>
+                <path d="M9 13h6"/>
+              </svg>
+            </div>
           </div>
-          <span class="event-tag">Ceremonia</span>
-          <h3 class="event-title">La Boda</h3>
-          <div class="event-detail">
+          
+          <h3 class="event-title">Ceremonia y Celebración</h3>
+          
+          <div class="event-detail date-detail">
             <span class="detail-label">Fecha</span>
             <span class="detail-value">{{ formattedDate }}</span>
           </div>
-          <div class="event-detail">
-            <span class="detail-label">Hora</span>
-            <span class="detail-value">{{ settings?.ceremonyTime || 'Por confirmar' }}</span>
-          </div>
-          <div class="event-detail">
-            <span class="detail-label">Lugar</span>
-            <span class="detail-value">{{ settings?.ceremonyLocation || 'Por confirmar' }}</span>
-          </div>
-          <p class="event-address" v-if="settings?.ceremonyAddress">
-            {{ settings.ceremonyAddress }}
-          </p>
-          <a
-            v-if="settings?.ceremonyMapsUrl"
-            :href="settings.ceremonyMapsUrl"
-            target="_blank"
-            rel="noopener"
-            class="event-button"
-          >
-            Ver ubicación
-          </a>
-        </div>
 
-        <div class="events-divider">
-          <span class="divider-line"></span>
-          <span class="divider-icon">♥</span>
-          <span class="divider-line"></span>
-        </div>
+          <div class="times-row">
+            <div class="event-detail">
+              <span class="detail-label">Ceremonia</span>
+              <span class="detail-value">{{ settings?.ceremonyTime || 'Por confirmar' }}</span>
+            </div>
+            <div class="event-detail">
+              <span class="detail-label">Celebración</span>
+              <span class="detail-value">{{ settings?.celebrationTime || 'Por confirmar' }}</span>
+            </div>
+          </div>
 
-        <div class="event-card celebration">
-          <div class="event-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-              <path d="M12 2a5 5 0 00-5 5v1H5a2 2 0 00-2 2v1a2 2 0 002 2h14a2 2 0 002-2v-1a2 2 0 00-2-2h-2V7a5 5 0 00-5-5z"/>
-              <path d="M7 13v7a2 2 0 002 2h6a2 2 0 002-2v-7"/>
-              <path d="M9 13h6"/>
-            </svg>
+          <div class="location-box">
+            <div class="event-detail">
+              <span class="detail-label">Lugar del Evento</span>
+              <span class="detail-value">{{ settings?.ceremonyLocation || 'Por confirmar' }}</span>
+            </div>
+            <p class="event-address" v-if="settings?.ceremonyAddress">
+              {{ settings.ceremonyAddress }}
+            </p>
+            <a
+              v-if="settings?.ceremonyMapsUrl"
+              :href="settings.ceremonyMapsUrl"
+              target="_blank"
+              rel="noopener"
+              class="event-button"
+            >
+              Ver ubicación
+            </a>
           </div>
-          <span class="event-tag">Celebración</span>
-          <h3 class="event-title">La Fiesta</h3>
-          <div class="event-detail">
-            <span class="detail-label">Fecha</span>
-            <span class="detail-value">{{ formattedDate }}</span>
-          </div>
-          <div class="event-detail">
-            <span class="detail-label">Hora</span>
-            <span class="detail-value">{{ settings?.celebrationTime || 'Por confirmar' }}</span>
-          </div>
-          <div class="event-detail">
-            <span class="detail-label">Lugar</span>
-            <span class="detail-value">{{ settings?.celebrationLocation || 'Por confirmar' }}</span>
-          </div>
-          <p class="event-address" v-if="settings?.celebrationAddress">
-            {{ settings.celebrationAddress }}
-          </p>
-          <a
-            v-if="settings?.celebrationMapsUrl"
-            :href="settings.celebrationMapsUrl"
-            target="_blank"
-            rel="noopener"
-            class="event-button"
-          >
-            Ver ubicación
-          </a>
         </div>
+      </div>
+
+      <div class="calendar-action-wrapper" v-if="settings?.calendarUrl" ref="elementRef3" :class="{ 'is-visible': isVisible3 }">
+        <a :href="settings.calendarUrl" target="_blank" rel="noopener" class="calendar-button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+          Agendar Recordatorio
+        </a>
       </div>
     </div>
   </section>
@@ -105,6 +98,7 @@ const props = defineProps<{
 
 const { elementRef, isVisible } = useScrollReveal()
 const { elementRef: elementRef2, isVisible: isVisible2 } = useScrollReveal()
+const { elementRef: elementRef3, isVisible: isVisible3 } = useScrollReveal()
 
 const formattedDate = computed(() => {
   const date = parseWeddingDate(props.settings?.weddingDate)
@@ -198,17 +192,15 @@ const formattedDate = computed(() => {
   margin: 0;
 }
 
-.events-grid {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: var(--space-8);
+.events-unified {
+  display: flex;
+  justify-content: center;
   opacity: 0;
   transform: translateY(30px);
   transition: opacity 0.8s ease 0.2s, transform 0.8s ease 0.2s;
 }
 
-.events-grid.is-visible {
+.events-unified.is-visible {
   opacity: 1;
   transform: translateY(0);
 }
@@ -221,6 +213,8 @@ const formattedDate = computed(() => {
   text-align: center;
   box-shadow: var(--shadow-md);
   transition: transform var(--transition-base), box-shadow var(--transition-base);
+  max-width: 600px;
+  width: 100%;
 }
 
 .event-card:hover {
@@ -228,10 +222,17 @@ const formattedDate = computed(() => {
   box-shadow: var(--shadow-lg);
 }
 
+.event-icons-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
 .event-icon {
-  width: 64px;
-  height: 64px;
-  margin: 0 auto var(--space-4);
+  width: 48px;
+  height: 48px;
   color: var(--text-accent);
 }
 
@@ -257,11 +258,28 @@ const formattedDate = computed(() => {
   margin-bottom: var(--space-6);
 }
 
+.date-detail {
+  margin-bottom: var(--space-8);
+}
+
+.times-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+  margin-bottom: var(--space-8);
+  padding: var(--space-4) 0;
+  border-top: 1px dashed var(--color-lavender-soft);
+  border-bottom: 1px dashed var(--color-lavender-soft);
+}
+
+.location-box {
+  margin-top: var(--space-6);
+}
+
 .event-detail {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-  margin-bottom: var(--space-4);
 }
 
 .detail-label {
@@ -307,39 +325,61 @@ const formattedDate = computed(() => {
   color: var(--color-white);
 }
 
-.events-divider {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--space-2);
-}
-
-.divider-line {
-  width: 1px;
-  height: 80px;
-  background: var(--color-lavender-soft);
-}
-
 .divider-icon {
   color: var(--color-rose);
   font-size: var(--text-xl);
   animation: pulse-soft 2s ease-in-out infinite;
 }
 
-@media (max-width: 900px) {
-  .events-grid {
+.calendar-action-wrapper {
+  margin-top: var(--space-12);
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+.calendar-action-wrapper.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.calendar-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8);
+  background: var(--color-sage);
+  color: var(--color-white);
+  border-radius: var(--radius-full);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+  text-decoration: none;
+}
+
+.calendar-button:hover {
+  background: var(--color-sage-dark);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.calendar-button svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (max-width: 640px) {
+  .event-card {
+    padding: var(--space-6);
+  }
+  
+  .times-row {
     grid-template-columns: 1fr;
-    gap: var(--space-8);
-  }
-
-  .events-divider {
-    flex-direction: row;
-    justify-content: center;
-  }
-
-  .divider-line {
-    width: 80px;
-    height: 1px;
+    gap: var(--space-4);
   }
 }
 </style>
