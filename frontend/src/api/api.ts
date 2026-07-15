@@ -53,14 +53,14 @@ export const api = {
   getGuestByToken: (token: string): Promise<Guest> =>
     fetchJson(`${API_URL}/guests/by-token/${token}`),
 
-  createGuest: (data: { fullName: string; email?: string; phone?: string }) =>
+  createGuest: (data: { fullName: string; email?: string; phone?: string; origin?: string }) =>
     fetchJson(`${API_URL}/guests`, {
       method: 'POST',
       body: JSON.stringify(data),
     }),
 
   createGuestsBulk: (
-    guests: Array<{ fullName: string; email?: string; phone?: string }>
+    guests: Array<{ fullName: string; email?: string; phone?: string; origin?: string }>
   ) =>
     fetchJson(`${API_URL}/guests/bulk`, {
       method: 'POST',
@@ -69,7 +69,7 @@ export const api = {
 
   updateGuest: (
     id: number,
-    data: { fullName?: string; email?: string; phone?: string }
+    data: { fullName?: string; email?: string; phone?: string; origin?: string }
   ) =>
     fetchJson(`${API_URL}/guests/${id}`, {
       method: 'PATCH',
