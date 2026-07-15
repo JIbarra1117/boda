@@ -34,9 +34,19 @@
             </td>
             <td>{{ r.musicSuggestion || '—' }}</td>
             <td>
-              <span class="message-cell" :title="r.message || ''">
-                {{ r.message || '—' }}
-              </span>
+              <button 
+                v-if="r.message" 
+                class="message-btn" 
+                @click="openMessageModal(r)"
+                title="Ver mensaje completo"
+              >
+                <span class="message-cell">{{ r.message }}</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"/>
+                  <path d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7Z"/>
+                </svg>
+              </button>
+              <span v-else>—</span>
             </td>
             <td>{{ formatDate(r.createdAt) }}</td>
           </tr>
@@ -46,15 +56,69 @@
         </tbody>
       </table>
     </div>
+
+    <Teleport to="body">
+      <div v-if="selectedRsvp" class="modal-overlay" @click.self="closeMessageModal">
+        <div class="modal-content">
+          <button class="modal-close" @click="closeMessageModal" aria-label="Cerrar">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18"/>
+              <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          
+          <div class="modal-header">
+            <h3>Detalles del RSVP</h3>
+            <p class="guest-name-large">{{ selectedRsvp.guest?.fullName }}</p>
+          </div>
+          
+          <div class="modal-body">
+            <div class="detail-row">
+              <span class="detail-label">Ceremonia:</span>
+              <span class="badge" :class="selectedRsvp.attendCeremony ? 'yes' : 'no'">
+                {{ selectedRsvp.attendCeremony ? 'Sí asistirá' : 'No asistirá' }}
+              </span>
+            </div>
+            <div class="detail-row">
+              <span class="detail-label">Celebración:</span>
+              <span class="badge" :class="selectedRsvp.attendCelebration ? 'yes' : 'no'">
+                {{ selectedRsvp.attendCelebration ? 'Sí asistirá' : 'No asistirá' }}
+              </span>
+            </div>
+            <div class="detail-row" v-if="selectedRsvp.musicSuggestion">
+              <span class="detail-label">Música sugerida:</span>
+              <p class="detail-text">{{ selectedRsvp.musicSuggestion }}</p>
+            </div>
+            <div class="detail-row full-width">
+              <span class="detail-label">Mensaje completo:</span>
+              <div class="message-box">
+                {{ selectedRsvp.message }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import type { RsvpRecord } from '@/types'
 
 defineProps<{
   rsvps: RsvpRecord[]
 }>()
+
+const selectedRsvp = ref<RsvpRecord | null>(null)
+
+const openMessageModal = (rsvp: RsvpRecord) => {
+  selectedRsvp.value = rsvp
+}
+
+const closeMessageModal = () => {
+  selectedRsvp.value = null
+}
 
 const formatDate = (iso: string) => {
   const d = new Date(iso)
@@ -97,6 +161,7 @@ const formatDate = (iso: string) => {
   overflow-x: auto;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-sand);
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -104,6 +169,7 @@ table {
   border-collapse: collapse;
   font-size: 0.9rem;
   background: var(--color-white);
+  min-width: 800px;
 }
 
 th,
@@ -121,6 +187,7 @@ th {
   text-transform: uppercase;
   font-size: 0.7rem;
   letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 tr:nth-child(even) {
@@ -136,21 +203,53 @@ tr:hover {
   color: var(--color-sage);
 }
 
+.message-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: transparent;
+  border: 1px solid var(--color-sand);
+  border-radius: var(--radius-md);
+  padding: 0.4rem 0.75rem;
+  cursor: pointer;
+  width: 100%;
+  max-width: 220px;
+  text-align: left;
+  transition: all 0.2s ease;
+  color: var(--color-sage);
+}
+
+.message-btn:hover {
+  border-color: var(--color-lavender-soft);
+  background: var(--bg-secondary);
+}
+
 .message-cell {
   display: block;
-  max-width: 200px;
+  flex: 1;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+}
+
+.message-btn svg {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
   color: var(--color-sage-light);
 }
 
 .badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   padding: 0.25rem 0.75rem;
   border-radius: var(--radius-full);
   font-size: 0.75rem;
   font-weight: 700;
+  white-space: nowrap;
 }
 
 .badge.yes {
@@ -170,14 +269,165 @@ tr:hover {
   font-style: italic;
 }
 
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 5000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(26, 17, 41, 0.65);
+  backdrop-filter: blur(4px);
+  padding: 1rem;
+}
+
+.modal-content {
+  position: relative;
+  background: var(--color-white);
+  border-radius: var(--radius-xl);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+  max-width: 500px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  animation: modal-fade-in 0.3s ease-out forwards;
+}
+
+@keyframes modal-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-secondary);
+  border: 1px solid var(--color-sand);
+  border-radius: 50%;
+  color: var(--color-sage-light);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-close:hover {
+  color: var(--color-sage);
+  background: var(--color-sand);
+  transform: rotate(90deg);
+}
+
+.modal-close svg {
+  width: 16px;
+  height: 16px;
+}
+
+.modal-header {
+  text-align: center;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid var(--color-sand);
+}
+
+.modal-header h3 {
+  font-family: var(--font-display);
+  color: var(--color-sage-light);
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem 0;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.guest-name-large {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--color-sage);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.modal-body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.detail-row.full-width {
+  grid-column: 1 / -1;
+}
+
+.detail-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-sage-light);
+  font-weight: 600;
+}
+
+.detail-text {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--color-sage);
+}
+
+.message-box {
+  background: #fcfbfe;
+  border: 1px solid var(--color-lavender-soft);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  color: var(--color-sage);
+  font-size: 1.05rem;
+  line-height: 1.6;
+  font-style: italic;
+  position: relative;
+}
+
+.message-box::before {
+  content: '"';
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  font-size: 3rem;
+  color: var(--color-lavender-soft);
+  font-family: var(--font-display);
+  line-height: 1;
+  opacity: 0.5;
+}
+
 @media (max-width: 640px) {
   .admin-section {
     padding: 1.25rem;
   }
 
-  th,
-  td {
-    padding: 0.75rem;
+  .modal-content {
+    padding: 2rem 1.5rem;
+  }
+  
+  .modal-body {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+  }
+  
+  .guest-name-large {
+    font-size: 1.5rem;
   }
 }
 </style>

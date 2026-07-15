@@ -198,7 +198,7 @@ const centerEvents: CenterEvent[] = [
     imageName: 'novios',
   },
   {
-    year: '2024',
+    year: '2026',
     stage: 'La propuesta',
     title: '¿Quieres casarte conmigo?',
     description: 'En un momento lleno de amor y emoción, dimos el sí más importante.',

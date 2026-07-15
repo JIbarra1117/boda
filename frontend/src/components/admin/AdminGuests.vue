@@ -569,6 +569,7 @@ button:disabled {
   overflow-x: auto;
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-sand);
+  -webkit-overflow-scrolling: touch;
 }
 
 table {
@@ -576,6 +577,7 @@ table {
   border-collapse: collapse;
   font-size: 0.9rem;
   background: var(--color-white);
+  min-width: 700px;
 }
 
 th,
@@ -593,6 +595,7 @@ th {
   text-transform: uppercase;
   font-size: 0.7rem;
   letter-spacing: 0.08em;
+  white-space: nowrap;
 }
 
 tr:nth-child(even) {
