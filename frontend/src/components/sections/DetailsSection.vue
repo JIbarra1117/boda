@@ -56,11 +56,11 @@
               <span class="detail-value">{{ settings?.ceremonyLocation || 'Por confirmar' }}</span>
             </div>
             <p class="event-address" v-if="settings?.ceremonyAddress">
-              {{ settings.ceremonyAddress }}
+              {{ settings?.ceremonyAddress }}
             </p>
             <a
               v-if="settings?.ceremonyMapsUrl"
-              :href="settings.ceremonyMapsUrl"
+              :href="settings?.ceremonyMapsUrl"
               target="_blank"
               rel="noopener"
               class="event-button"
@@ -72,7 +72,7 @@
       </div>
 
       <div class="calendar-action-wrapper" v-show="settings?.calendarUrl" ref="elementRef3" :class="{ 'is-visible': isVisible3 }">
-        <a :href="settings.calendarUrl" target="_blank" rel="noopener" class="calendar-button">
+        <a :href="settings?.calendarUrl" target="_blank" rel="noopener" class="calendar-button">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
             <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
             <line x1="16" y1="2" x2="16" y2="6"/>
