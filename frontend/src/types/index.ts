@@ -30,6 +30,7 @@ export interface Guest {
   fullName: string
   email?: string
   phone?: string
+  origin?: string
   token: string
   code?: string
   hasRsvp: boolean

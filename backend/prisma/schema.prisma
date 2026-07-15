@@ -43,6 +43,7 @@ model Guest {
   fullName  String   @map("full_name")
   email     String?
   phone     String?
+  origin    String?
   token     String   @unique @default(uuid())
   code      String?  @unique
   hasRsvp   Boolean  @default(false) @map("has_rsvp")

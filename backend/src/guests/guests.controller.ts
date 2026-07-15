@@ -22,6 +22,7 @@ export class GuestsController {
       fullName: string;
       email?: string;
       phone?: string;
+      origin?: string;
     },
   ) {
     return this.guestsService.create(body);
@@ -35,6 +36,7 @@ export class GuestsController {
         fullName: string;
         email?: string;
         phone?: string;
+        origin?: string;
       }>;
     },
   ) {
@@ -49,6 +51,7 @@ export class GuestsController {
       fullName?: string;
       email?: string;
       phone?: string;
+      origin?: string;
     },
   ) {
     return this.guestsService.update(Number(id), body);

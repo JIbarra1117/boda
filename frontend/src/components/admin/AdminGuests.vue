@@ -41,6 +41,18 @@
         </div>
       </div>
 
+      <div class="form-row">
+        <div class="form-group">
+          <label for="origin">Origen (De parte de quién)</label>
+          <select id="origin" v-model="form.origin">
+            <option value="">No especificado</option>
+            <option value="Novia">Novia</option>
+            <option value="Novio">Novio</option>
+            <option value="Ambos/Otro">Ambos / Otro</option>
+          </select>
+        </div>
+      </div>
+
       <div class="form-actions">
         <button type="submit" :disabled="loading" class="btn-primary">
           {{ loading ? 'Guardando...' : editingId ? 'Actualizar invitado' : 'Agregar invitado' }}
@@ -64,7 +76,7 @@
       <h3>Carga masiva desde Excel</h3>
       <p class="hint">
         Subí un archivo Excel (.xlsx) con las columnas:
-        <code>fullName</code>, <code>email</code>, <code>phone</code>.
+        <code>fullName</code>, <code>email</code>, <code>phone</code>, <code>origen</code>.
         La primera fila debe ser el encabezado.
       </p>
 
@@ -86,6 +98,7 @@
                 <th>Nombre</th>
                 <th>Email</th>
                 <th>Teléfono</th>
+                <th>Origen</th>
               </tr>
             </thead>
             <tbody>
@@ -93,6 +106,7 @@
                 <td>{{ row.fullName }}</td>
                 <td>{{ row.email || '—' }}</td>
                 <td>{{ row.phone || '—' }}</td>
+                <td>{{ row.origin || '—' }}</td>
               </tr>
             </tbody>
           </table>
@@ -121,11 +135,33 @@
       </div>
     </div>
 
+    <div class="filters-section">
+      <div class="form-group">
+        <label for="searchQuery">Buscar invitado</label>
+        <input 
+          id="searchQuery" 
+          v-model="searchQuery" 
+          type="text" 
+          placeholder="Ej. Familia López" 
+        />
+      </div>
+      <div class="form-group">
+        <label for="filterOrigin">Filtrar por origen</label>
+        <select id="filterOrigin" v-model="filterOrigin">
+          <option value="">Todos</option>
+          <option value="Novia">Novia</option>
+          <option value="Novio">Novio</option>
+          <option value="Ambos/Otro">Ambos / Otro</option>
+        </select>
+      </div>
+    </div>
+
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
             <th>Invitado</th>
+            <th>Origen</th>
             <th>Estado</th>
             <th>Código</th>
             <th>Corto</th>
@@ -133,12 +169,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="guest in guests" :key="guest.id">
+          <tr v-for="guest in filteredGuests" :key="guest.id">
             <td>
               <div class="guest-name">{{ guest.fullName }}</div>
               <div v-if="guest.email || guest.phone" class="guest-contact">
                 {{ guest.email }}<span v-if="guest.email && guest.phone"> · </span>{{ guest.phone }}
               </div>
+            </td>
+            <td>
+              <span class="badge origin-badge" v-if="guest.origin">{{ guest.origin }}</span>
+              <span v-else class="token">—</span>
             </td>
             <td>
               <span class="badge" :class="guest.hasRsvp ? 'yes' : 'pending'">
@@ -177,8 +217,8 @@
               </div>
             </td>
           </tr>
-          <tr v-if="guests.length === 0">
-            <td colspan="5" class="empty">Aún no hay invitados registrados</td>
+          <tr v-if="filteredGuests.length === 0">
+            <td colspan="6" class="empty">No se encontraron invitados</td>
           </tr>
         </tbody>
       </table>
@@ -207,7 +247,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, onMounted } from 'vue'
+import { reactive, ref, computed, onMounted } from 'vue'
 import JSZip from 'jszip'
 import { saveAs } from 'file-saver'
 import * as XLSX from 'xlsx'
@@ -226,7 +266,7 @@ const downloadingAll = ref(false)
 const baseUrl = getBaseUrl()
 
 const excelInput = ref<HTMLInputElement | null>(null)
-const excelPreview = ref<{ fullName: string; email: string; phone: string }[]>([])
+const excelPreview = ref<{ fullName: string; email: string; phone: string; origin: string }[]>([])
 const bulkLoading = ref(false)
 const bulkSuccess = ref('')
 const bulkErrors = ref<{ row: number; fullName: string; error: string }[]>([])
@@ -235,6 +275,18 @@ const form = reactive({
   fullName: '',
   email: '',
   phone: '',
+  origin: '',
+})
+
+const searchQuery = ref('')
+const filterOrigin = ref('')
+
+const filteredGuests = computed(() => {
+  return guests.value.filter(g => {
+    const matchName = g.fullName.toLowerCase().includes(searchQuery.value.toLowerCase())
+    const matchOrigin = filterOrigin.value ? g.origin === filterOrigin.value : true
+    return matchName && matchOrigin
+  })
 })
 
 const loadGuests = async () => {
@@ -256,6 +308,7 @@ const handleSubmit = async () => {
         fullName: form.fullName,
         email: form.email || undefined,
         phone: form.phone || undefined,
+        origin: form.origin || undefined,
       })
       success.value = 'Invitado actualizado correctamente'
     } else {
@@ -263,6 +316,7 @@ const handleSubmit = async () => {
         fullName: form.fullName,
         email: form.email || undefined,
         phone: form.phone || undefined,
+        origin: form.origin || undefined,
       })
       success.value = 'Invitado agregado correctamente'
     }
@@ -280,6 +334,7 @@ const editGuest = (guest: Guest) => {
   form.fullName = guest.fullName
   form.email = guest.email || ''
   form.phone = guest.phone || ''
+  form.origin = guest.origin || ''
 }
 
 const deleteGuest = async (id: number) => {
@@ -299,6 +354,7 @@ const resetForm = () => {
   form.fullName = ''
   form.email = ''
   form.phone = ''
+  form.origin = ''
   success.value = ''
   error.value = ''
 }
@@ -359,12 +415,13 @@ const handleExcelUpload = (event: Event) => {
       const nameIndex = headers.indexOf('fullname')
       const emailIndex = headers.indexOf('email')
       const phoneIndex = headers.indexOf('phone')
+      const originIndex = headers.indexOf('origen') || headers.indexOf('origin')
       if (nameIndex === -1) {
         error.value = 'El archivo debe tener la columna fullName'
         return
       }
 
-      const parsed: { fullName: string; email: string; phone: string }[] = []
+      const parsed: { fullName: string; email: string; phone: string; origin: string }[] = []
 
       for (let i = 1; i < json.length; i++) {
         const row = json[i]
@@ -375,6 +432,7 @@ const handleExcelUpload = (event: Event) => {
           fullName,
           email: emailIndex >= 0 ? String(row[emailIndex] || '').trim() : '',
           phone: phoneIndex >= 0 ? String(row[phoneIndex] || '').trim() : '',
+          origin: originIndex >= 0 ? String(row[originIndex] || '').trim() : '',
         })
       }
 
@@ -496,7 +554,8 @@ onMounted(loadGuests)
   font-family: var(--font-body);
 }
 
-.form-group input {
+.form-group input,
+.form-group select {
   padding: 0.7rem;
   border: 1px solid var(--color-lavender-soft);
   border-radius: var(--radius-md);
@@ -506,10 +565,32 @@ onMounted(loadGuests)
   background: var(--color-white);
 }
 
-.form-group input:focus {
+.form-group input:focus,
+.form-group select:focus {
   outline: none;
   border-color: var(--color-lavender-light);
   box-shadow: 0 0 0 3px rgba(192, 184, 227, 0.2);
+}
+
+.filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--color-white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-sand);
+}
+
+.filters-section .form-group {
+  flex: 1;
+}
+
+@media (max-width: 640px) {
+  .filters-section {
+    flex-direction: column;
+    padding: 1rem;
+  }
 }
 
 .form-actions {
@@ -649,6 +730,12 @@ tr:hover {
 .badge.pending {
   background-color: var(--color-sand);
   color: var(--color-sage-light);
+}
+
+.badge.origin-badge {
+  background-color: var(--color-lavender-soft);
+  color: var(--color-sage-dark);
+  font-weight: 600;
 }
 
 .row-actions {
