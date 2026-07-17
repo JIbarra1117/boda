@@ -5,11 +5,49 @@
       <p class="hint">Lista de invitados que ya confirmaron su asistencia a la ceremonia y celebración.</p>
     </div>
 
+    <div class="filters-section">
+      <div class="form-group">
+        <label for="searchQuery">Buscar invitado</label>
+        <input 
+          id="searchQuery" 
+          v-model="searchQuery" 
+          type="text" 
+          placeholder="Ej. Familia López" 
+        />
+      </div>
+      <div class="form-group">
+        <label for="filterCeremony">Ceremonia</label>
+        <select id="filterCeremony" v-model="filterCeremony">
+          <option value="">Todos</option>
+          <option value="yes">Sí asistirá</option>
+          <option value="no">No asistirá</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="filterOrigin">Origen</label>
+        <select id="filterOrigin" v-model="filterOrigin">
+          <option value="">Todos</option>
+          <option value="Novia">Novia</option>
+          <option value="Novio">Novio</option>
+          <option value="Ambos/Otro">Ambos / Otro</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="filterCelebration">Celebración</label>
+        <select id="filterCelebration" v-model="filterCelebration">
+          <option value="">Todos</option>
+          <option value="yes">Sí asistirá</option>
+          <option value="no">No asistirá</option>
+        </select>
+      </div>
+    </div>
+
     <div class="table-wrapper">
       <table>
         <thead>
           <tr>
             <th>Invitado</th>
+            <th>Origen</th>
             <th>Ceremonia</th>
             <th>Celebración</th>
             <th>Música sugerida</th>
@@ -18,9 +56,13 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="r in rsvps" :key="r.id">
+          <tr v-for="r in filteredRsvps" :key="r.id">
             <td>
               <div class="guest-name">{{ r.guest?.fullName || '—' }}</div>
+            </td>
+            <td>
+              <span class="badge origin-badge" v-if="r.guest?.origin">{{ r.guest.origin }}</span>
+              <span v-else class="token">—</span>
             </td>
             <td>
               <span class="badge" :class="r.attendCeremony ? 'yes' : 'no'">
@@ -50,8 +92,8 @@
             </td>
             <td>{{ formatDate(r.createdAt) }}</td>
           </tr>
-          <tr v-if="rsvps.length === 0">
-            <td colspan="6" class="empty">Aún no hay confirmaciones</td>
+          <tr v-if="filteredRsvps.length === 0">
+            <td colspan="7" class="empty">No se encontraron confirmaciones</td>
           </tr>
         </tbody>
       </table>
@@ -103,12 +145,43 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import type { RsvpRecord } from '@/types'
 
-defineProps<{
+const props = defineProps<{
   rsvps: RsvpRecord[]
 }>()
+
+const searchQuery = ref('')
+const filterCeremony = ref('')
+const filterCelebration = ref('')
+const filterOrigin = ref('')
+
+const filteredRsvps = computed(() => {
+  return props.rsvps.filter(r => {
+    const guestName = r.guest?.fullName || ''
+    const matchName = guestName.toLowerCase().includes(searchQuery.value.toLowerCase())
+    
+    let matchCeremony = true
+    if (filterCeremony.value !== '') {
+      const wantsCeremony = filterCeremony.value === 'yes'
+      matchCeremony = r.attendCeremony === wantsCeremony
+    }
+    
+    let matchCelebration = true
+    if (filterCelebration.value !== '') {
+      const wantsCelebration = filterCelebration.value === 'yes'
+      matchCelebration = r.attendCelebration === wantsCelebration
+    }
+    
+    let matchOrigin = true
+    if (filterOrigin.value !== '') {
+      matchOrigin = r.guest?.origin === filterOrigin.value
+    }
+    
+    return matchName && matchCeremony && matchCelebration && matchOrigin
+  })
+})
 
 const selectedRsvp = ref<RsvpRecord | null>(null)
 
@@ -155,6 +228,56 @@ const formatDate = (iso: string) => {
   color: var(--color-sage-light);
   font-size: 0.9rem;
   margin: 0;
+}
+
+.filters-section {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background: var(--color-white);
+  padding: 1rem 1.5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-sand);
+}
+
+.filters-section .form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.form-group label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--color-sage-light);
+  font-family: var(--font-body);
+}
+
+.form-group input,
+.form-group select {
+  padding: 0.7rem;
+  border: 1px solid var(--color-lavender-soft);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-family: var(--font-body);
+  color: var(--color-sage);
+  background: var(--color-white);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: var(--color-lavender-light);
+  box-shadow: 0 0 0 3px rgba(192, 184, 227, 0.2);
+}
+
+@media (max-width: 640px) {
+  .filters-section {
+    flex-direction: column;
+    padding: 1rem;
+  }
 }
 
 .table-wrapper {
@@ -260,6 +383,12 @@ tr:hover {
 .badge.no {
   background-color: var(--color-sand);
   color: var(--color-sage-light);
+}
+
+.badge.origin-badge {
+  background-color: var(--color-lavender-soft);
+  color: var(--color-sage-dark);
+  font-weight: 600;
 }
 
 .empty {
